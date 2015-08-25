@@ -12,7 +12,7 @@ private Sprite gameOver;
 	
     @Override
     public void createScene(){
-    	gameOver = new Sprite(0, 0, resourcesManager.gameOver_region, vbom)
+    	gameOver = new Sprite(0, 0, resourceManager.gameOver_region, vbom)
     	{
     	    @Override
     	    protected void preDraw(GLState pGLState, Camera pCamera) 

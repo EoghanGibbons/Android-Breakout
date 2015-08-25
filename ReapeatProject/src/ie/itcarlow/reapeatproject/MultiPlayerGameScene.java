@@ -7,6 +7,11 @@ import org.andengine.entity.scene.Scene;
 import org.andengine.input.touch.TouchEvent;
 
 public class MultiPlayerGameScene extends BaseScene implements IOnSceneTouchListener {
+	//---------------------------------------------
+    // VARIABLES
+    //---------------------------------------------
+	private AndroidWebSocketClient mWebSocketClient;
+	
 	@Override
 	public boolean onSceneTouchEvent(Scene pScene, TouchEvent pSceneTouchEvent) {
 		// TODO Auto-generated method stub
@@ -15,8 +20,8 @@ public class MultiPlayerGameScene extends BaseScene implements IOnSceneTouchList
 
 	@Override
 	public void createScene() {
-		
-		
+		mWebSocketClient = new AndroidWebSocketClient();
+		mWebSocketClient.connectToServer();
 	}
 
 	@Override

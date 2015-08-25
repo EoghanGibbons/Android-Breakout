@@ -4,6 +4,7 @@ import java.util.Iterator;
 
 import ie.itcarlow.reapeatproject.SceneManager.SceneType;
 
+import org.andengine.engine.camera.Camera;
 import org.andengine.engine.camera.hud.HUD;
 import org.andengine.entity.scene.IOnSceneTouchListener;
 import org.andengine.entity.scene.Scene;
@@ -18,6 +19,7 @@ import org.andengine.input.touch.TouchEvent;
 import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlas;
 import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlasTextureRegionFactory;
 import org.andengine.opengl.texture.region.ITextureRegion;
+import org.andengine.opengl.util.GLState;
 import org.andengine.util.color.Color;
 
 import com.badlogic.gdx.math.Vector2;
@@ -38,17 +40,16 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener {
 	private HUD gameHUD;
 	
 	private PhysicsWorld physicsWorld;
-	
-	private BitmapTextureAtlas mTexturePlayer;
-	
-	private ITextureRegion mPlayerTextureRegion;
 	private ITextureRegion mBoundryTextureRegion;
 	
-	private Sprite player;
-
-	private boolean canJump = true;
-	public boolean gameOver = false;
+	private Player player;
+	private Ball ball;
+	private Brick[][] bricks;
 	
+	private final int NROWS = 5;
+	private final int NCOLS = 5;
+	
+	public boolean gameOver = false;
 	
 	//---------------------------------------------
     // CONSTRUCTOR
@@ -61,8 +62,7 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener {
 	    createBackground();
 	    //createHUD();
 	    createPhysics();
-	    createPlayer();
-	    createBoundry();
+	    createLevel();
 	    setOnSceneTouchListener(this);
 	    //this.engine.registerUpdateHandler(this);
 	}
@@ -72,7 +72,7 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener {
     //---------------------------------------------
 	
 	private void createPhysics(){
-		physicsWorld = new FixedStepPhysicsWorld(60, new Vector2(0, 9.81f), false); 
+		physicsWorld = new FixedStepPhysicsWorld(60, new Vector2(0.0f, 0.0f), false); 
 		registerUpdateHandler(physicsWorld);
 		physicsWorld.setContactListener(createContactListener());
 	}
@@ -81,7 +81,7 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener {
 	    gameHUD = new HUD();
 	    
 	    // CREATE SCORE TEXT
-	    scoreText = new Text(20, 420, resourcesManager.font, "Score: 0123456789", vbom);
+	    scoreText = new Text(20, 420, resourceManager.font, "Score: 0123456789", vbom);
 	    //scoreText.setAnchorCenter(0, 0);    
 	    scoreText.setText("Click Character to jump");
 	    gameHUD.attachChild(scoreText);
@@ -89,62 +89,59 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener {
 	    camera.setHUD(gameHUD);
 	}
 	
-	private void createBoundry(){
+	private void createLevel(){
 		final FixtureDef fixDef = PhysicsFactory.createFixtureDef(0f,0f, 1.0f);
 		
 		BitmapTextureAtlas mTextureBoundryFloor = new BitmapTextureAtlas(engine.getTextureManager(), 800, 10);
 		mBoundryTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(mTextureBoundryFloor, this.activity, "floor.png", 0, 0);
-		mTextureBoundryFloor.load();
-		
-		Sprite floor = new Sprite(0,470, mBoundryTextureRegion, engine.getVertexBufferObjectManager());
-		Body bodyFloor = PhysicsFactory.createBoxBody(physicsWorld, floor, BodyType.StaticBody, fixDef);
-		bodyFloor.setUserData("floor");
-		floor.setUserData(bodyFloor);
-		physicsWorld.registerPhysicsConnector(new PhysicsConnector(floor, bodyFloor, true, true));
-		attachChild(floor);
-		
-		Sprite roof = new Sprite(0,0, mBoundryTextureRegion, engine.getVertexBufferObjectManager());
+		Sprite roof = new Sprite(0,-10, mBoundryTextureRegion, engine.getVertexBufferObjectManager());
 		Body bodyRoof = PhysicsFactory.createBoxBody(physicsWorld, roof, BodyType.StaticBody, fixDef);
 		physicsWorld.registerPhysicsConnector(new PhysicsConnector(roof, bodyRoof, true, true));
 		attachChild(roof);
 		
-		BitmapTextureAtlas mTextureBoundryWall = new BitmapTextureAtlas(engine.getTextureManager(), 10, 460);
+		BitmapTextureAtlas mTextureBoundryWall = new BitmapTextureAtlas(engine.getTextureManager(), 10, 480);
 		mBoundryTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(mTextureBoundryWall, this.activity, "wall.png", 0, 0);
 		mTextureBoundryWall.load();
 		
-		Sprite wallLeft = new Sprite(0,10, mBoundryTextureRegion, engine.getVertexBufferObjectManager());
+		Sprite wallLeft = new Sprite(-10,0, mBoundryTextureRegion, engine.getVertexBufferObjectManager());
 		Body bodyWallLeft = PhysicsFactory.createBoxBody(physicsWorld, wallLeft, BodyType.StaticBody, fixDef);
 		physicsWorld.registerPhysicsConnector(new PhysicsConnector(wallLeft, bodyWallLeft, true, true));
 		attachChild(wallLeft);
 		
-		Sprite wallRight = new Sprite(790,10, mBoundryTextureRegion, engine.getVertexBufferObjectManager());
+		Sprite wallRight = new Sprite(800,0, mBoundryTextureRegion, engine.getVertexBufferObjectManager());
 		Body bodyWallRight = PhysicsFactory.createBoxBody(physicsWorld, wallRight, BodyType.StaticBody, fixDef);
 		physicsWorld.registerPhysicsConnector(new PhysicsConnector(wallRight, bodyWallRight, true, true));
 		attachChild(wallRight);
-	}
-	
-	public void createPlayer(){
-		mTexturePlayer = new BitmapTextureAtlas(engine.getTextureManager(), 40, 40);  
-		mPlayerTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(mTexturePlayer, this.activity, "player.png", 0, 0);
-        mTexturePlayer.load();
-        player = new Sprite(20, 430,  mPlayerTextureRegion, engine.getVertexBufferObjectManager());
-        createPhysicsBodies();
-        this.attachChild(player);
-	}
-	
-	private void createPhysicsBodies(){
-		final FixtureDef fixDef = PhysicsFactory.createFixtureDef(1.5f,0f, 0.3f);
 		
-		Body body = PhysicsFactory.createBoxBody(physicsWorld, player, BodyType.DynamicBody, fixDef);
-		body.setFixedRotation(true);
-		body.setUserData("player");
-    	player.setUserData(body); 
-    	physicsWorld.registerPhysicsConnector(new PhysicsConnector(player, body, true, true));
-	 }
+		player = new Player(360, 450, vbom, physicsWorld){
+			@Override
+			public void onDie(){
+        	}
+		};
+		attachChild(player);
+		
+		/*
+		for (int i=0; i < NROWS; i++) {
+	    	for (int j=0; j < NCOLS; j++) {
+	      		bricks[i][j] = new Brick( (i) * (10 +80) , (1+j) * (10 + 20), vbom, physicsWorld, i+j , 1);
+	      		attachChild(bricks[i][j]);
+	    	}
+	  	}
+	  	*/
+	}
 	
 	private void createBackground()
 	{
-	    setBackground(new Background(Color.WHITE));
+		//setBackground(new Background(Color.WHITE));
+		attachChild(new Sprite(0, 0, resourceManager.game_background_region, vbom)
+	    {
+	        @Override
+	        protected void preDraw(GLState pGLState, Camera pCamera) 
+	        {
+	            super.preDraw(pGLState, pCamera);
+	            pGLState.enableDither();
+	        }
+	    });
 	}
 	
 	private ContactListener createContactListener()
@@ -158,10 +155,6 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener {
 
                 if (x1.getBody().getUserData() != null && x2.getBody().getUserData() != null)
                 {
-                    if (x2.getBody().getUserData().equals("player")|| (x1.getBody().getUserData().equals("player")))
-                    {
-                        canJump = true;
-                    }
                 }
             }
 
@@ -172,10 +165,6 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener {
 
                 if (x1.getBody().getUserData() != null && x2.getBody().getUserData() != null)
                 {
-                    if (x2.getBody().getUserData().equals("player") || (x1.getBody().getUserData().equals("player")))
-                    {
-                        canJump = false;
-                    }
                 }
             }
 
@@ -198,37 +187,7 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener {
 	
 	@Override
 	public boolean onSceneTouchEvent(Scene pScene, TouchEvent pSceneTouchEvent) {
-		float touchFromRight = pSceneTouchEvent.getX() - (player.getX() + player.getWidth());
-		float touchFromLeft = pSceneTouchEvent.getX() - player.getX();
-		float touchFromBottom = pSceneTouchEvent.getY() - (player.getY() + player.getHeight());
-		float touchFromTop = pSceneTouchEvent.getY() - player.getY();
-		Body bodyPlayer = (Body) player.getUserData();
-		//Touch to the right of the player
-		if ((touchFromRight > 0) && (touchFromRight < 800)){
-			if (touchFromRight > 30){
-				bodyPlayer.setLinearVelocity(5, bodyPlayer.getLinearVelocity().y);
-			}
-			else{
-				bodyPlayer.setLinearVelocity(1, bodyPlayer.getLinearVelocity().y);
-			}
-		}
 		
-		//Touch to the left of the player
-		else if ((touchFromLeft < 0) && (touchFromLeft > -800)){
-			
-			if (touchFromLeft < -30){
-				bodyPlayer.setLinearVelocity(-5, bodyPlayer.getLinearVelocity().y);
-			}
-			else{
-				bodyPlayer.setLinearVelocity(-1, bodyPlayer.getLinearVelocity().y);
-			}
-		}
-	
-		//Touch on the player
-		else if ((touchFromLeft > 0) && (touchFromRight < 0) && (touchFromTop > 0) && (touchFromBottom < 0) && (canJump)){
-			bodyPlayer.setLinearVelocity(bodyPlayer.getLinearVelocity().x, -9);
-			ResourceManager.jumpSound.play();
-		}
 		return false;
 	}
 	

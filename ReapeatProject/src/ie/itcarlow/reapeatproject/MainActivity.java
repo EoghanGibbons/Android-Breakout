@@ -91,6 +91,9 @@ public class MainActivity extends BaseGameActivity implements IUpdateHandler {
 				SceneManager.getInstance().createGameOverScene();
 			}
 		}
+		else if (SceneManager.getInstance().getCurrentSceneType() == SceneManager.SceneType.SCENE_MULTIPLAYER) {
+			MultiPlayerGameScene scene = (MultiPlayerGameScene) SceneManager.getInstance().getCurrentScene();
+		}
 	}
 
 	@Override

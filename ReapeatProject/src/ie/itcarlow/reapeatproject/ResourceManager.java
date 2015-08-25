@@ -17,6 +17,7 @@ import org.andengine.opengl.texture.atlas.bitmap.source.IBitmapTextureAtlasSourc
 import org.andengine.opengl.texture.atlas.buildable.builder.BlackPawnTextureAtlasBuilder;
 import org.andengine.opengl.texture.atlas.buildable.builder.ITextureAtlasBuilder.TextureAtlasBuilderException;
 import org.andengine.opengl.texture.region.ITextureRegion;
+import org.andengine.opengl.texture.region.ITiledTextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 import org.andengine.util.debug.Debug;
 
@@ -35,12 +36,6 @@ public class ResourceManager
     public Camera camera;
     public VertexBufferObjectManager vbom;
     
-    public ITextureRegion splash_region;
-    public ITextureRegion gameOver_region;
-    public ITextureRegion menu_background_region;
-    public ITextureRegion singlePlayer_region;
-    public ITextureRegion multiPlayer_region;
-    
     private BitmapTextureAtlas splashTextureAtlas;   
     private BitmapTextureAtlas gameOverTextureAtlas;
     private BuildableBitmapTextureAtlas menuTextureAtlas;
@@ -49,11 +44,27 @@ public class ResourceManager
     //audio
     public static Music gameMusic;
     public static Music menuMusic;
-    public static Music jumpSound;
     
     //---------------------------------------------
     // TEXTURES & TEXTURE REGIONS
     //---------------------------------------------
+    
+    //Splash Screen
+    public ITextureRegion splash_region;
+    //Gameover Screen
+    public ITextureRegion gameOver_region;
+    
+    //Menu
+    public ITextureRegion menu_background_region;
+    public ITextureRegion singlePlayer_region;
+    public ITextureRegion multiPlayer_region;
+    
+    //Game
+    public BuildableBitmapTextureAtlas gameTextureAtlas;
+    public ITextureRegion player_region;
+    public ITextureRegion brick_region;
+    public ITiledTextureRegion ball_region;
+    public ITextureRegion game_background_region;
     
     //---------------------------------------------
     // CLASS LOGIC
@@ -123,7 +134,20 @@ public class ResourceManager
     
     private void loadGameGraphics()
     {
-        
+    	gameTextureAtlas = new BuildableBitmapTextureAtlas(activity.getTextureManager(), 2048, 2048, TextureOptions.BILINEAR);
+    	player_region = BitmapTextureAtlasTextureRegionFactory.createFromAsset(gameTextureAtlas, activity, "player.png");
+    	brick_region = BitmapTextureAtlasTextureRegionFactory.createFromAsset(gameTextureAtlas, activity, "brick.png");
+    	game_background_region = BitmapTextureAtlasTextureRegionFactory.createFromAsset(gameTextureAtlas, activity, "BreakoutBackground.png");
+    	
+    	try 
+        {
+            this.gameTextureAtlas.build(new BlackPawnTextureAtlasBuilder<IBitmapTextureAtlasSource, BitmapTextureAtlas>(0, 1, 0));
+            this.gameTextureAtlas.load();
+        } 
+        catch (final TextureAtlasBuilderException e)
+        {
+            Debug.e(e);
+        }
     }
     
     private void loadGameFonts()
@@ -136,7 +160,6 @@ public class ResourceManager
     	MusicFactory.setAssetBasePath("");
         try {
 			gameMusic = MusicFactory.createMusicFromAsset(engine.getMusicManager(), activity, "music.mp3");
-			jumpSound = MusicFactory.createMusicFromAsset(engine.getMusicManager(), activity, "jump.mp3");
 		}  catch (IOException e) {
 			e.printStackTrace();
 		}

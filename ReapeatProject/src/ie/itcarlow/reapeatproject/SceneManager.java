@@ -16,6 +16,7 @@ public class SceneManager
     private BaseScene gameScene;
     private BaseScene loadingScene;
     private BaseScene gameOverScene;
+    private BaseScene multiPlayerGameScene;
     
     //---------------------------------------------
     // VARIABLES
@@ -31,6 +32,7 @@ public class SceneManager
         SCENE_SPLASH,
         SCENE_MENU,
         SCENE_GAME,
+        SCENE_MULTIPLAYER,
         SCENE_LOADING,
         SCENE_GAMEOVER,
     }
@@ -85,6 +87,21 @@ public class SceneManager
             }
         }));
     }
+    
+    public void loadMultiplayerGameScene(final Engine mEngine){
+    	setScene(loadingScene);
+        ResourceManager.getInstance().unloadMenuTextures();
+        mEngine.registerUpdateHandler(new TimerHandler(0.1f, new ITimerCallback() 
+        {
+            public void onTimePassed(final TimerHandler pTimerHandler) 
+            {
+                mEngine.unregisterUpdateHandler(pTimerHandler);
+                ResourceManager.getInstance().loadGameResources();
+                multiPlayerGameScene = new MultiPlayerGameScene();
+                setScene(multiPlayerGameScene);
+            }
+        }));
+    }
 
     public void loadMenuScene(final Engine mEngine)
     {
@@ -116,6 +133,8 @@ public class SceneManager
             }
         }));
     }
+    
+    
     
     //---------------------------------------------
     // GETTERS AND SETTERS

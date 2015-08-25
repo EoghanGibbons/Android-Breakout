@@ -10,8 +10,6 @@ import org.andengine.entity.scene.menu.item.decorator.ScaleMenuItemDecorator;
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.opengl.util.GLState;
 
-
-
 public class MainMenuScene extends BaseScene implements IOnMenuItemClickListener {
 
 	private MenuScene menuChildScene;
@@ -23,8 +21,8 @@ public class MainMenuScene extends BaseScene implements IOnMenuItemClickListener
 	    menuChildScene = new MenuScene(camera);
 	    menuChildScene.setPosition(0, 0);
 	    
-	    final IMenuItem singlePlayerMenuItem = new ScaleMenuItemDecorator(new SpriteMenuItem(MENU_SINGLEPLAYER, resourcesManager.singlePlayer_region, vbom), 1.2f, 1);
-	    final IMenuItem multiPlayerMenuItem = new ScaleMenuItemDecorator(new SpriteMenuItem(MENU_MULTIPLAYER, resourcesManager.multiPlayer_region, vbom), 1.2f, 1);
+	    final IMenuItem singlePlayerMenuItem = new ScaleMenuItemDecorator(new SpriteMenuItem(MENU_SINGLEPLAYER, resourceManager.singlePlayer_region, vbom), 1.2f, 1);
+	    final IMenuItem multiPlayerMenuItem = new ScaleMenuItemDecorator(new SpriteMenuItem(MENU_MULTIPLAYER, resourceManager.multiPlayer_region, vbom), 1.2f, 1);
 	    
 	    menuChildScene.addMenuItem(singlePlayerMenuItem);
 	    menuChildScene.addMenuItem(multiPlayerMenuItem);
@@ -50,6 +48,7 @@ public class MainMenuScene extends BaseScene implements IOnMenuItemClickListener
 	            SceneManager.getInstance().loadGameScene(engine);
 	            return true;
 	        case MENU_MULTIPLAYER:
+	        	SceneManager.getInstance().loadMultiplayerGameScene(engine);
 	            return true;
 	        default:
 	            return false;
@@ -81,7 +80,7 @@ public class MainMenuScene extends BaseScene implements IOnMenuItemClickListener
 	}
 	
 	public void createBackground(){
-		attachChild(new Sprite(0, 0, resourcesManager.menu_background_region, vbom)
+		attachChild(new Sprite(0, 0, resourceManager.menu_background_region, vbom)
 	    {
 	        @Override
 	        protected void preDraw(GLState pGLState, Camera pCamera) 

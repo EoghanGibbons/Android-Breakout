@@ -59,11 +59,11 @@ public class AndroidWebSocketClient {
 		
 	}
 	
-	void sendMessage() {
+	void connectToServer() {
 		try { 
 			JSONObject json  = new JSONObject();
-			json.put("Name", "Client");
-			json.put("Number", 1);
+			json.put("type", "pid");
+			json.put("join", "Android Client");
 			mClient.send(json.toString());
 		}
 		catch(JSONException e) {
