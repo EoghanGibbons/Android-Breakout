@@ -96,6 +96,7 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener {
 		mBoundryTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(mTextureBoundryFloor, this.activity, "floor.png", 0, 0);
 		Sprite roof = new Sprite(0,-10, mBoundryTextureRegion, engine.getVertexBufferObjectManager());
 		Body bodyRoof = PhysicsFactory.createBoxBody(physicsWorld, roof, BodyType.StaticBody, fixDef);
+		bodyRoof.setUserData("roof");
 		physicsWorld.registerPhysicsConnector(new PhysicsConnector(roof, bodyRoof, true, true));
 		attachChild(roof);
 		
@@ -105,11 +106,13 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener {
 		
 		Sprite wallLeft = new Sprite(-10,0, mBoundryTextureRegion, engine.getVertexBufferObjectManager());
 		Body bodyWallLeft = PhysicsFactory.createBoxBody(physicsWorld, wallLeft, BodyType.StaticBody, fixDef);
+		bodyWallLeft.setUserData("wallLeft");
 		physicsWorld.registerPhysicsConnector(new PhysicsConnector(wallLeft, bodyWallLeft, true, true));
 		attachChild(wallLeft);
 		
 		Sprite wallRight = new Sprite(800,0, mBoundryTextureRegion, engine.getVertexBufferObjectManager());
 		Body bodyWallRight = PhysicsFactory.createBoxBody(physicsWorld, wallRight, BodyType.StaticBody, fixDef);
+		bodyWallRight.setUserData("wallRight");
 		physicsWorld.registerPhysicsConnector(new PhysicsConnector(wallRight, bodyWallRight, true, true));
 		attachChild(wallRight);
 		
@@ -119,6 +122,10 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener {
         	}
 		};
 		attachChild(player);
+		
+		ball = new Ball(400, 300, vbom, physicsWorld);
+		
+		attachChild(ball);
 		
 		/*
 		for (int i=0; i < NROWS; i++) {
@@ -155,6 +162,18 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener {
 
                 if (x1.getBody().getUserData() != null && x2.getBody().getUserData() != null)
                 {
+                	if ((x1.getBody().getUserData() == "player") && (x2.getBody().getUserData() == "ball")){
+                		ball.bounce(true);
+                	}
+                	
+                	if (((x1.getBody().getUserData() == "wallLeft") || (x1.getBody().getUserData() == "wallRight")) && (x2.getBody().getUserData() == "ball")){
+                		ball.bounce(false);
+                	}
+                	
+                	if (((x1.getBody().getUserData() == "roof") || (x1.getBody().getUserData() == "ball")) 
+                	&& ((x2.getBody().getUserData() == "ball") || (x2.getBody().getUserData() == "roof") ) ){
+                		ball.bounce(true);
+                	}
                 }
             }
 
