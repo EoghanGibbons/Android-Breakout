@@ -11,6 +11,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 
 public class Ball extends AnimatedSprite {
 	private Body body;
+	public boolean lifeLost;
 	
 	public Ball(float pX, float pY, VertexBufferObjectManager vbo, PhysicsWorld physicsWorld)
 	{
@@ -26,7 +27,7 @@ public class Ball extends AnimatedSprite {
 
         body.setUserData("ball");
         body.setFixedRotation(true);
-        body.setLinearVelocity(10, 0);
+        body.setLinearVelocity(0, 10);
         
         physicsWorld.registerPhysicsConnector(new PhysicsConnector(this, body, true, false)
         {
@@ -35,8 +36,48 @@ public class Ball extends AnimatedSprite {
             {
             	//body.setLinearVelocity(body.getLinearVelocity().x * pSecondsElapsed, body.getLinearVelocity().y * pSecondsElapsed);
                 super.onUpdate(pSecondsElapsed);
-                //final long[] BALL_ANIMATE = new long[] { 100, 100, 100 };
-                //animate(BALL_ANIMATE, 0, 7, true);
+                final long[] BALL_ANIMATE = new long[] { 100, 100, 100, 100, 100, 100, 100, 100,
+                										 100, 100, 100, 100, 100, 100, 100, 100,
+                										 100, 100, 100, 100, 100, 100, 100, 100,
+                										 100, 100, 100, 100, 100, 100, 100, 100};
+                animate(BALL_ANIMATE, 1, 32, true, new IAnimationListener(){
+
+					@Override
+					public void onAnimationStarted(
+							AnimatedSprite pAnimatedSprite,
+							int pInitialLoopCount) {
+						// TODO Auto-generated method stub
+						
+					}
+
+					@Override
+					public void onAnimationFrameChanged(
+							AnimatedSprite pAnimatedSprite, int pOldFrameIndex,
+							int pNewFrameIndex) {
+						// TODO Auto-generated method stub
+						
+					}
+
+					@Override
+					public void onAnimationLoopFinished(
+							AnimatedSprite pAnimatedSprite,
+							int pRemainingLoopCount, int pInitialLoopCount) {
+						// TODO Auto-generated method stub
+						
+					}
+
+					@Override
+					public void onAnimationFinished(
+							AnimatedSprite pAnimatedSprite) {
+						animate(BALL_ANIMATE, 1, 32, true);
+						
+					}
+                	
+                });
+                
+                if (getY() <= -20){
+                	lifeLost = true;
+                }
             }
         });
     }
@@ -46,5 +87,10 @@ public class Ball extends AnimatedSprite {
 			body.setLinearVelocity(body.getLinearVelocity().x, body.getLinearVelocity().y * -1);
 		else
 			body.setLinearVelocity(body.getLinearVelocity().x * -1, body.getLinearVelocity().y);
+	}
+	
+	public void reset(int x, int y, int velX, int velY){
+		body.setTransform(x, y, 0);
+		body.setLinearVelocity(velX, velY);
 	}
 }

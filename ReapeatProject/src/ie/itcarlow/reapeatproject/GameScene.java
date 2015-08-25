@@ -44,10 +44,10 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener {
 	
 	private Player player;
 	private Ball ball;
-	private Brick[][] bricks;
 	
-	private final int NROWS = 5;
+	private final int NROWS = 9;
 	private final int NCOLS = 5;
+	private Brick[][] bricks;
 	
 	public boolean gameOver = false;
 	
@@ -123,18 +123,17 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener {
 		};
 		attachChild(player);
 		
-		ball = new Ball(400, 300, vbom, physicsWorld);
+		ball = new Ball(390, 300, vbom, physicsWorld);
 		
 		attachChild(ball);
 		
-		/*
+		bricks = new Brick[NROWS][NCOLS];
 		for (int i=0; i < NROWS; i++) {
 	    	for (int j=0; j < NCOLS; j++) {
-	      		bricks[i][j] = new Brick( (i) * (10 +80) , (1+j) * (10 + 20), vbom, physicsWorld, i+j , 1);
+	    		bricks[i][j] = new Brick( (i) * (10 +80) , (1+j) * (10 + 20), vbom, physicsWorld, i, j, 1);
 	      		attachChild(bricks[i][j]);
 	    	}
 	  	}
-	  	*/
 	}
 	
 	private void createBackground()
@@ -166,36 +165,28 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener {
                 		ball.bounce(true);
                 	}
                 	
+                	if ((x1.getBody().getUserData() == "brick") && (x2.getBody().getUserData() == "ball")){
+                		ball.bounce(true);
+                	}
+                	
                 	if (((x1.getBody().getUserData() == "wallLeft") || (x1.getBody().getUserData() == "wallRight")) && (x2.getBody().getUserData() == "ball")){
                 		ball.bounce(false);
                 	}
                 	
-                	if (((x1.getBody().getUserData() == "roof") || (x1.getBody().getUserData() == "ball")) 
-                	&& ((x2.getBody().getUserData() == "ball") || (x2.getBody().getUserData() == "roof") ) ){
+                	if ((x1.getBody().getUserData() == "roof") || (x1.getBody().getUserData() == "ball")){
                 		ball.bounce(true);
                 	}
                 }
             }
 
-            public void endContact(Contact contact)
-            {
-                final Fixture x1 = contact.getFixtureA();
-                final Fixture x2 = contact.getFixtureB();
+			@Override
+			public void endContact(Contact contact) {}
 
-                if (x1.getBody().getUserData() != null && x2.getBody().getUserData() != null)
-                {
-                }
-            }
+			@Override
+			public void preSolve(Contact contact, Manifold oldManifold) {}
 
-            public void preSolve(Contact contact, Manifold oldManifold)
-            {
-
-            }
-
-            public void postSolve(Contact contact, ContactImpulse impulse)
-            {
-
-            }
+			@Override
+			public void postSolve(Contact contact, ContactImpulse impulse) {}
         };
         return contactListener;
     }
@@ -206,7 +197,9 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener {
 	
 	@Override
 	public boolean onSceneTouchEvent(Scene pScene, TouchEvent pSceneTouchEvent) {
-		
+		//float touchedX = pSceneTouchEvent.getX();
+		//float distance = touchedX-player.getX() + 40;
+		//player.setX(distance);
 		return false;
 	}
 	
