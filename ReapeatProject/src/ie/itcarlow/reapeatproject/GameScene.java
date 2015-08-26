@@ -1,14 +1,14 @@
 package ie.itcarlow.reapeatproject;
 
-import java.util.Iterator;
-
 import ie.itcarlow.reapeatproject.SceneManager.SceneType;
+
+import java.util.Iterator;
 
 import org.andengine.engine.camera.Camera;
 import org.andengine.engine.camera.hud.HUD;
 import org.andengine.entity.scene.IOnSceneTouchListener;
 import org.andengine.entity.scene.Scene;
-import org.andengine.entity.scene.background.Background;
+import org.andengine.entity.shape.IShape;
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.entity.text.Text;
 import org.andengine.extension.physics.box2d.FixedStepPhysicsWorld;
@@ -20,7 +20,10 @@ import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlas;
 import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlasTextureRegionFactory;
 import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.util.GLState;
-import org.andengine.util.color.Color;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import android.util.Log;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -44,6 +47,7 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener {
 	
 	private Player player;
 	private Ball ball;
+	private boolean resetBall;
 	
 	private final int NROWS = 9;
 	private final int NCOLS = 5;
@@ -64,7 +68,7 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener {
 	    createPhysics();
 	    createLevel();
 	    setOnSceneTouchListener(this);
-	    //this.engine.registerUpdateHandler(this);
+	    this.engine.registerUpdateHandler(this);
 	}
 
 	//---------------------------------------------
@@ -72,7 +76,17 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener {
     //---------------------------------------------
 	
 	private void createPhysics(){
-		physicsWorld = new FixedStepPhysicsWorld(60, new Vector2(0.0f, 0.0f), false); 
+		physicsWorld = new FixedStepPhysicsWorld(60, new Vector2(0.0f, 0.0f), false){
+			@Override
+			public void onUpdate(float pSecondsElapsed){
+				super.onUpdate(pSecondsElapsed);
+				removeObjectsSetForDestruction();
+				removeBricksSetForDestruction();
+				if (resetBall){
+					removeBallPhysicsConnector();
+				}
+			}
+		}; 
 		registerUpdateHandler(physicsWorld);
 		physicsWorld.setContactListener(createContactListener());
 	}
@@ -99,6 +113,13 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener {
 		bodyRoof.setUserData("roof");
 		physicsWorld.registerPhysicsConnector(new PhysicsConnector(roof, bodyRoof, true, true));
 		attachChild(roof);
+		
+		Sprite floor = new Sprite(0,470, mBoundryTextureRegion, engine.getVertexBufferObjectManager());
+		Body bodyFloor = PhysicsFactory.createBoxBody(physicsWorld, floor, BodyType.StaticBody, fixDef);
+		bodyFloor.setUserData("floor");
+		floor.setUserData(bodyFloor);
+		physicsWorld.registerPhysicsConnector(new PhysicsConnector(floor, bodyFloor, true, true));
+		attachChild(floor);
 		
 		BitmapTextureAtlas mTextureBoundryWall = new BitmapTextureAtlas(engine.getTextureManager(), 10, 480);
 		mBoundryTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(mTextureBoundryWall, this.activity, "wall.png", 0, 0);
@@ -165,15 +186,21 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener {
                 		ball.bounce(true);
                 	}
                 	
-                	if ((x1.getBody().getUserData() == "brick") && (x2.getBody().getUserData() == "ball")){
-                		ball.bounce(true);
-                	}
-                	
                 	if (((x1.getBody().getUserData() == "wallLeft") || (x1.getBody().getUserData() == "wallRight")) && (x2.getBody().getUserData() == "ball")){
                 		ball.bounce(false);
                 	}
                 	
                 	if ((x1.getBody().getUserData() == "roof") || (x1.getBody().getUserData() == "ball")){
+                		ball.bounce(true);
+                	}
+                	
+                	if (( x1.getBody().getUserData() == "floor") && (x2.getBody().getUserData() == "ball")){
+                		x2.getBody().setUserData("destroy");
+                		player.loseLife();
+                		resetBall = true;
+                	}
+                	
+                	if (( x1.getBody().getUserData() == "brick") && (x2.getBody().getUserData() == "ball")){
                 		ball.bounce(true);
                 	}
                 }
@@ -195,8 +222,84 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener {
     // CLASS LOGIC
     //---------------------------------------------
 	
+	private void removeObjectsSetForDestruction()
+	{
+		for (Iterator<Body> iter = physicsWorld.getBodies(); iter.hasNext();){
+			final Body currentBody = iter.next();
+			if (currentBody.getUserData() == "destroy"){
+				this.engine.runOnUpdateThread(new Runnable(){
+					public void run() {
+						// Find the physics connector associated with the sprite mPiglet
+						//Sprite destroyShape = (Sprite) currentBody.getUserData();
+						//PhysicsConnector physicsConnector = physicsWorld.getPhysicsConnectorManager().findPhysicsConnectorByShape(destroyShape);
+						// Unregister the physics connector
+						//physicsWorld.unregisterPhysicsConnector(physicsConnector);
+						// Destroy the body
+						//physicsWorld.destroyBody(physicsConnector.getBody());
+						physicsWorld.destroyBody(currentBody);
+						currentBody.setUserData(null);
+					}
+				});
+			}
+		}
+	}
+	
+	private void removeBallPhysicsConnector(){
+		this.engine.runOnUpdateThread(new Runnable(){
+			public void run() {
+					// Find the physics connector associated with the sprite mPiglet
+					PhysicsConnector physicsConnector = physicsWorld.getPhysicsConnectorManager().findPhysicsConnectorByShape(ball);
+					// Unregister the physics connector
+					physicsWorld.unregisterPhysicsConnector(physicsConnector);
+				}
+			});
+		resetBall = false;
+		ball.reset(physicsWorld);
+	}
+	
+	private void removeBricksSetForDestruction(){
+		for (int i=0; i < NROWS; i++) {
+	    	for (int j=0; j < NCOLS; j++) {
+	    		if (bricks[i][j].getHP() < 1){
+	    			final Brick destroyedBrick = bricks[i][j];
+	    			this.engine.runOnUpdateThread(new Runnable(){
+	    				public void run() {
+	    						// Find the physics connector associated with the sprite mPiglet
+	    						PhysicsConnector physicsConnector = physicsWorld.getPhysicsConnectorManager().findPhysicsConnectorByShape(destroyedBrick);
+	    						// Unregister the physics connector
+	    						physicsWorld.unregisterPhysicsConnector(physicsConnector);
+	    						physicsWorld.destroyBody(physicsConnector.getBody());
+	    					}
+	    				});
+	    		}
+	    	}
+		} 	
+	}
+	
 	@Override
 	public boolean onSceneTouchEvent(Scene pScene, TouchEvent pSceneTouchEvent) {
+		float touchFromRight = pSceneTouchEvent.getX() - (player.getX() + player.getWidth());
+		float touchFromLeft = pSceneTouchEvent.getX() - player.getX();
+		//Touch to the right of the player
+		if ((touchFromRight > 0) && (touchFromRight < 800)){
+			if (touchFromRight > 30){
+				player.setX(5f);
+			}
+			else{
+				player.setX(1f);
+			}
+		}
+		
+		//Touch to the left of the player
+		else if ((touchFromLeft < 0) && (touchFromLeft > -800)){
+			
+			if (touchFromLeft < -30){
+				player.setX(-5f);
+			}
+			else{
+				player.setX(-1f);
+			}
+		}
 		//float touchedX = pSceneTouchEvent.getX();
 		//float distance = touchedX-player.getX() + 40;
 		//player.setX(distance);

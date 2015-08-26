@@ -1,5 +1,6 @@
 package ie.itcarlow.reapeatproject;
 
+import org.andengine.engine.Engine;
 import org.andengine.entity.sprite.AnimatedSprite;
 import org.andengine.extension.physics.box2d.PhysicsConnector;
 import org.andengine.extension.physics.box2d.PhysicsFactory;
@@ -29,8 +30,7 @@ public class Ball extends AnimatedSprite {
         body.setFixedRotation(true);
         body.setLinearVelocity(0, 10);
         
-        physicsWorld.registerPhysicsConnector(new PhysicsConnector(this, body, true, false)
-        {
+        physicsWorld.registerPhysicsConnector(new PhysicsConnector(this, body, true, false){
             @Override
             public void onUpdate(float pSecondsElapsed)
             {
@@ -74,10 +74,6 @@ public class Ball extends AnimatedSprite {
 					}
                 	
                 });
-                
-                if (getY() <= -20){
-                	lifeLost = true;
-                }
             }
         });
     }
@@ -89,8 +85,17 @@ public class Ball extends AnimatedSprite {
 			body.setLinearVelocity(body.getLinearVelocity().x * -1, body.getLinearVelocity().y);
 	}
 	
-	public void reset(int x, int y, int velX, int velY){
-		body.setTransform(x, y, 0);
-		body.setLinearVelocity(velX, velY);
+	public void reset(final PhysicsWorld physicsWorld){
+		/*Engine engine = ResourceManager.getInstance().engine;
+		engine.runOnUpdateThread(new Runnable(){
+			@Override
+			public void run() {
+				PhysicsConnector physicsConnector = physicsWorld.getPhysicsConnectorManager().findPhysicsConnectorByShape(this); 
+				physicsWorld.unregisterPhysicsConnector(physicsConnector);
+				physicsWorld.destroyBody(physicsConnector.getBody());
+			}
+		});*/
+		super.setPosition(390,300);
+		createPhysics(physicsWorld);
 	}
 }

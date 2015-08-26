@@ -46,4 +46,12 @@ public class Brick extends Sprite {
 		Vector2 returnVect = new Vector2(idX, idY);
 		return returnVect;
 	}
+	
+	public void reduceHP(){
+		hp += -1;
+	}
+	
+	public int getHP(){
+		return hp;
+	}
 }

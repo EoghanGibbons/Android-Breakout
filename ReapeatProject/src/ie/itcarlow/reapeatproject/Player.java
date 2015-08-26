@@ -25,7 +25,7 @@ public abstract class Player extends Sprite {
     private void createPhysics(PhysicsWorld physicsWorld)
     {        
         body = PhysicsFactory.createBoxBody(physicsWorld, this, BodyType.DynamicBody, PhysicsFactory.createFixtureDef(0, 0, 0));
-        body.setLinearDamping(10);
+        body.setLinearDamping(1);
         body.setUserData("player");
         body.setFixedRotation(true);
         
@@ -46,6 +46,14 @@ public abstract class Player extends Sprite {
     }
     
     public void setX(float pX){
-    	//body.setLinearVelocity((float) (Math.sqrt(20 * pX)), 0.0f);
+    	body.setLinearVelocity(pX, 0.0f);
+    }
+    
+    public int getLives(){
+    	return lives;
+    }
+    
+    public void loseLife(){
+    	lives += -1;
     }
 }
