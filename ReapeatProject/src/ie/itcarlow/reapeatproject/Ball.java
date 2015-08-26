@@ -12,7 +12,6 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 
 public class Ball extends AnimatedSprite {
 	private Body body;
-	public boolean lifeLost;
 	
 	public Ball(float pX, float pY, VertexBufferObjectManager vbo, PhysicsWorld physicsWorld)
 	{
@@ -86,16 +85,11 @@ public class Ball extends AnimatedSprite {
 	}
 	
 	public void reset(final PhysicsWorld physicsWorld){
-		/*Engine engine = ResourceManager.getInstance().engine;
-		engine.runOnUpdateThread(new Runnable(){
-			@Override
-			public void run() {
-				PhysicsConnector physicsConnector = physicsWorld.getPhysicsConnectorManager().findPhysicsConnectorByShape(this); 
-				physicsWorld.unregisterPhysicsConnector(physicsConnector);
-				physicsWorld.destroyBody(physicsConnector.getBody());
-			}
-		});*/
-		super.setPosition(390,300);
+		super.setPosition(390,200);
 		createPhysics(physicsWorld);
+	}
+	
+	public void setXVelocity(float pXVel){
+		body.setLinearVelocity((float)(pXVel*.1), body.getLinearVelocity().y);
 	}
 }

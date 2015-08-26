@@ -11,6 +11,7 @@ import org.andengine.entity.scene.Scene;
 import org.andengine.entity.shape.IShape;
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.entity.text.Text;
+import org.andengine.entity.text.TextOptions;
 import org.andengine.extension.physics.box2d.FixedStepPhysicsWorld;
 import org.andengine.extension.physics.box2d.PhysicsConnector;
 import org.andengine.extension.physics.box2d.PhysicsFactory;
@@ -41,6 +42,7 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener {
     //---------------------------------------------
 	private Text scoreText;
 	private HUD gameHUD;
+	private Sprite HUDSprite;
 	
 	private PhysicsWorld physicsWorld;
 	private ITextureRegion mBoundryTextureRegion;
@@ -64,9 +66,9 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener {
 		ResourceManager.gameMusic.play();
     	ResourceManager.gameMusic.setLooping(true);
 	    createBackground();
-	    //createHUD();
 	    createPhysics();
 	    createLevel();
+	    createHUD();
 	    setOnSceneTouchListener(this);
 	    this.engine.registerUpdateHandler(this);
 	}
@@ -93,14 +95,15 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener {
 	
 	private void createHUD(){
 	    gameHUD = new HUD();
-	    
-	    // CREATE SCORE TEXT
-	    scoreText = new Text(20, 420, resourceManager.font, "Score: 0123456789", vbom);
-	    //scoreText.setAnchorCenter(0, 0);    
-	    scoreText.setText("Click Character to jump");
-	    gameHUD.attachChild(scoreText);
-	    
+	    //HUDSprite = new Sprite(0, 460, resourceManager.HUD_region, vbom);
+	    //gameHUD.attachChild(HUDSprite);
 	    camera.setHUD(gameHUD);
+	    // CREATE SCORE TEXT
+	    scoreText = new Text(0, 440, resourceManager.font, "Score: 0123456789", vbom);
+	    scoreText.setTextOptions(new TextOptions());
+	    //scoreText.setAnchorCenter(0, 0);    
+	    scoreText.setText("fml");
+	    gameHUD.attachChild(scoreText);
 	}
 	
 	private void createLevel(){
@@ -114,7 +117,7 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener {
 		physicsWorld.registerPhysicsConnector(new PhysicsConnector(roof, bodyRoof, true, true));
 		attachChild(roof);
 		
-		Sprite floor = new Sprite(0,470, mBoundryTextureRegion, engine.getVertexBufferObjectManager());
+		Sprite floor = new Sprite(0,500, mBoundryTextureRegion, engine.getVertexBufferObjectManager());
 		Body bodyFloor = PhysicsFactory.createBoxBody(physicsWorld, floor, BodyType.StaticBody, fixDef);
 		bodyFloor.setUserData("floor");
 		floor.setUserData(bodyFloor);
@@ -144,7 +147,7 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener {
 		};
 		attachChild(player);
 		
-		ball = new Ball(390, 300, vbom, physicsWorld);
+		ball = new Ball(390, 200, vbom, physicsWorld);
 		
 		attachChild(ball);
 		
@@ -183,6 +186,7 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener {
                 if (x1.getBody().getUserData() != null && x2.getBody().getUserData() != null)
                 {
                 	if ((x1.getBody().getUserData() == "player") && (x2.getBody().getUserData() == "ball")){
+                		ball.setXVelocity((ball.getX() + (ball.getWidth()/2)) - (player.getX() + (player.getWidth()/2)));
                 		ball.bounce(true);
                 	}
                 	
@@ -229,13 +233,6 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener {
 			if (currentBody.getUserData() == "destroy"){
 				this.engine.runOnUpdateThread(new Runnable(){
 					public void run() {
-						// Find the physics connector associated with the sprite mPiglet
-						//Sprite destroyShape = (Sprite) currentBody.getUserData();
-						//PhysicsConnector physicsConnector = physicsWorld.getPhysicsConnectorManager().findPhysicsConnectorByShape(destroyShape);
-						// Unregister the physics connector
-						//physicsWorld.unregisterPhysicsConnector(physicsConnector);
-						// Destroy the body
-						//physicsWorld.destroyBody(physicsConnector.getBody());
 						physicsWorld.destroyBody(currentBody);
 						currentBody.setUserData(null);
 					}
@@ -259,13 +256,14 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener {
 	
 	private void removeBricksSetForDestruction(){
 		for (int i=0; i < NROWS; i++) {
+			final int x = i;
 	    	for (int j=0; j < NCOLS; j++) {
+	    		final int y = j;
 	    		if (bricks[i][j].getHP() < 1){
-	    			final Brick destroyedBrick = bricks[i][j];
 	    			this.engine.runOnUpdateThread(new Runnable(){
 	    				public void run() {
 	    						// Find the physics connector associated with the sprite mPiglet
-	    						PhysicsConnector physicsConnector = physicsWorld.getPhysicsConnectorManager().findPhysicsConnectorByShape(destroyedBrick);
+	    						PhysicsConnector physicsConnector = physicsWorld.getPhysicsConnectorManager().findPhysicsConnectorByShape(bricks[x][y]);
 	    						// Unregister the physics connector
 	    						physicsWorld.unregisterPhysicsConnector(physicsConnector);
 	    						physicsWorld.destroyBody(physicsConnector.getBody());
@@ -282,7 +280,10 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener {
 		float touchFromLeft = pSceneTouchEvent.getX() - player.getX();
 		//Touch to the right of the player
 		if ((touchFromRight > 0) && (touchFromRight < 800)){
-			if (touchFromRight > 30){
+			if (touchFromRight> 100){
+				player.setX(20f);
+			}
+			else if (touchFromRight > 30){
 				player.setX(5f);
 			}
 			else{
@@ -292,8 +293,10 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener {
 		
 		//Touch to the left of the player
 		else if ((touchFromLeft < 0) && (touchFromLeft > -800)){
-			
-			if (touchFromLeft < -30){
+			if(touchFromLeft < -100){
+				player.setX(-20f);
+			}
+			else if (touchFromLeft < -30){
 				player.setX(-5f);
 			}
 			else{
