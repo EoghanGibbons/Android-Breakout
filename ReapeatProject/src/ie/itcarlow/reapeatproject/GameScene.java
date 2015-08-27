@@ -8,7 +8,6 @@ import org.andengine.engine.camera.Camera;
 import org.andengine.engine.camera.hud.HUD;
 import org.andengine.entity.scene.IOnSceneTouchListener;
 import org.andengine.entity.scene.Scene;
-import org.andengine.entity.shape.IShape;
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.entity.text.Text;
 import org.andengine.entity.text.TextOptions;
@@ -21,10 +20,6 @@ import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlas;
 import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlasTextureRegionFactory;
 import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.util.GLState;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import android.util.Log;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -41,8 +36,8 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener {
     // VARIABLES
     //---------------------------------------------
 	private Text scoreText;
+	private Text livesText;
 	private HUD gameHUD;
-	private Sprite HUDSprite;
 	
 	private PhysicsWorld physicsWorld;
 	private ITextureRegion mBoundryTextureRegion;
@@ -50,6 +45,7 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener {
 	private Player player;
 	private Ball ball;
 	private boolean resetBall;
+	private int score = 0;
 	
 	private final int NROWS = 9;
 	private final int NCOLS = 5;
@@ -67,8 +63,8 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener {
     	ResourceManager.gameMusic.setLooping(true);
 	    createBackground();
 	    createPhysics();
-	    createLevel();
 	    createHUD();
+	    createLevel();
 	    setOnSceneTouchListener(this);
 	    this.engine.registerUpdateHandler(this);
 	}
@@ -99,11 +95,16 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener {
 	    //gameHUD.attachChild(HUDSprite);
 	    camera.setHUD(gameHUD);
 	    // CREATE SCORE TEXT
-	    scoreText = new Text(0, 440, resourceManager.font, "Score: 0123456789", vbom);
+	    scoreText = new Text(740, 460, resourceManager.gameFont, "Score: 123456", vbom);
 	    scoreText.setTextOptions(new TextOptions());
+	    livesText = new Text(20, 460, resourceManager.gameFont, "Lives: 123456", vbom);
+	    livesText.setTextOptions(new TextOptions());
+	    
 	    //scoreText.setAnchorCenter(0, 0);    
-	    scoreText.setText("fml");
+	    scoreText.setText("Score: " + score);
+	    livesText.setText("Lives: " + 3);
 	    gameHUD.attachChild(scoreText);
+	    gameHUD.attachChild(livesText);
 	}
 	
 	private void createLevel(){
@@ -163,8 +164,7 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener {
 	private void createBackground()
 	{
 		//setBackground(new Background(Color.WHITE));
-		attachChild(new Sprite(0, 0, resourceManager.game_background_region, vbom)
-	    {
+		attachChild(new Sprite(0, 0, resourceManager.game_background_region, vbom){
 	        @Override
 	        protected void preDraw(GLState pGLState, Camera pCamera) 
 	        {
@@ -201,6 +201,7 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener {
                 	if (( x1.getBody().getUserData() == "floor") && (x2.getBody().getUserData() == "ball")){
                 		x2.getBody().setUserData("destroy");
                 		player.loseLife();
+                		//livesText.setText("Lives: " + player.getLives());
                 		resetBall = true;
                 	}
                 	

@@ -66,6 +66,7 @@ public class ResourceManager
     public ITextureRegion HUD_region;
     public ITiledTextureRegion ball_region;
     public ITextureRegion game_background_region;
+    public Font gameFont;
     
     //---------------------------------------------
     // CLASS LOGIC
@@ -155,7 +156,11 @@ public class ResourceManager
     
     private void loadGameFonts()
     {
-        
+    	FontFactory.setAssetBasePath("");
+        final ITexture mainFontTexture = new BitmapTextureAtlas(activity.getTextureManager(), 256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+
+        gameFont = FontFactory.createStrokeFromAsset(activity.getFontManager(), mainFontTexture, activity.getAssets(), "font.ttf", 12, true, Color.WHITE, 2, Color.BLACK);
+        gameFont.load();
     }
     
     private void loadGameAudio()
