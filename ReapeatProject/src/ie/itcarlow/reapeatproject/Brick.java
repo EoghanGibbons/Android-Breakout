@@ -5,6 +5,7 @@ import org.andengine.extension.physics.box2d.PhysicsConnector;
 import org.andengine.extension.physics.box2d.PhysicsFactory;
 import org.andengine.extension.physics.box2d.PhysicsWorld;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
+import org.andengine.util.color.Color;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -15,6 +16,7 @@ public class Brick extends Sprite {
 	private int hp;
 	private int idX;
 	private int idY;
+	private Color brickColor;
 	
 	public Brick(float pX, float pY, VertexBufferObjectManager vbo, PhysicsWorld physicsWorld, int pIdX, int pIdY, int health)
 	{
@@ -22,6 +24,30 @@ public class Brick extends Sprite {
 	    hp = health;
 	    idX = pIdX;
 	    idY = pIdY;
+	    switch(idY){
+	    case 0:
+	    	brickColor = Color.RED;
+	    	break;
+	    case 1:
+	    	brickColor = new Color(255, 165, 0);
+	    	break;
+	    case 2:
+	    	brickColor = Color.YELLOW;
+	    	break;
+	    case 3:
+	    	brickColor = Color.GREEN;
+	    	break;
+	    case 4:
+	    	brickColor = Color.BLUE;
+	    	break;
+	    case 5:
+	    	brickColor = new Color(75,0,30);
+	    	break;
+	    case 6:
+	    	brickColor = new Color(238,130,238);
+	    	break;
+	    }
+	    super.setColor(brickColor);
 	    createPhysics(physicsWorld);
 	}
 	
