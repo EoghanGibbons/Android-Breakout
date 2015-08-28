@@ -1,6 +1,5 @@
 package ie.itcarlow.reapeatproject;
 
-import org.andengine.engine.Engine;
 import org.andengine.entity.sprite.AnimatedSprite;
 import org.andengine.extension.physics.box2d.PhysicsConnector;
 import org.andengine.extension.physics.box2d.PhysicsFactory;
@@ -13,21 +12,19 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 public class Ball extends AnimatedSprite {
 	private Body body;
 	
-	public Ball(float pX, float pY, VertexBufferObjectManager vbo, PhysicsWorld physicsWorld)
-	{
+	public Ball(float pX, float pY, VertexBufferObjectManager vbo, PhysicsWorld physicsWorld){
 	    super(pX, pY, ResourceManager.getInstance().ball_region, vbo);
 	    this.setWidth(20);
 	    this.setHeight(20);
 	    createPhysics(physicsWorld);
 	}
 	
-	private void createPhysics(PhysicsWorld physicsWorld)
-    {        
-        body = PhysicsFactory.createCircleBody(physicsWorld, this, BodyType.DynamicBody, PhysicsFactory.createFixtureDef(0, 0, 0));//createBoxBody(physicsWorld, this, BodyType.DynamicBody, PhysicsFactory.createFixtureDef(0, 0, 0));
+	private void createPhysics(PhysicsWorld physicsWorld){        
+        body = PhysicsFactory.createCircleBody(physicsWorld, this, BodyType.DynamicBody, PhysicsFactory.createFixtureDef(0, 0, 0));
 
         body.setUserData("ball");
         body.setFixedRotation(true);
-        body.setLinearVelocity(0, 10);
+        body.setLinearVelocity(0, 5);
         
         physicsWorld.registerPhysicsConnector(new PhysicsConnector(this, body, true, false){
             @Override
@@ -82,11 +79,6 @@ public class Ball extends AnimatedSprite {
 			body.setLinearVelocity(body.getLinearVelocity().x, body.getLinearVelocity().y * -1);
 		else
 			body.setLinearVelocity(body.getLinearVelocity().x * -1, body.getLinearVelocity().y);
-	}
-	
-	public void reset(final PhysicsWorld physicsWorld){
-		super.setPosition(390,200);
-		createPhysics(physicsWorld);
 	}
 	
 	public void setXVelocity(float pXVel){

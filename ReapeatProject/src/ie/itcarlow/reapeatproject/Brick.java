@@ -16,11 +16,12 @@ public class Brick extends Sprite {
 	private int hp;
 	private int idX;
 	private int idY;
+	private boolean destroyed = false;
 	private Color brickColor;
 	
 	public Brick(float pX, float pY, VertexBufferObjectManager vbo, PhysicsWorld physicsWorld, int pIdX, int pIdY, int health)
 	{
-	    super(pX, pY, ResourceManager.getInstance().brick_region, vbo);
+	    super(pX, pY, ResourceManager.getInstance().brick_region.deepCopy(), vbo);
 	    hp = health;
 	    idX = pIdX;
 	    idY = pIdY;
@@ -79,5 +80,17 @@ public class Brick extends Sprite {
 	
 	public int getHP(){
 		return hp;
+	}
+	
+	public boolean isDestroyed(){
+		return destroyed;
+	}
+	
+	public void setDestroyed(boolean pDes){
+		destroyed = pDes;
+	}
+	
+	public Body getBody(){
+		return body;
 	}
 }

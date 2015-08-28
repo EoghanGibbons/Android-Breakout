@@ -159,7 +159,7 @@ public class ResourceManager
     	FontFactory.setAssetBasePath("");
         final ITexture mainFontTexture = new BitmapTextureAtlas(activity.getTextureManager(), 256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
 
-        gameFont = FontFactory.createStrokeFromAsset(activity.getFontManager(), mainFontTexture, activity.getAssets(), "font.ttf", 12, true, Color.WHITE, 2, Color.BLACK);
+        gameFont = FontFactory.createStrokeFromAsset(activity.getFontManager(), mainFontTexture, activity.getAssets(), "font.ttf", 16, true, Color.WHITE, 2, Color.BLACK);
         gameFont.load();
     }
     

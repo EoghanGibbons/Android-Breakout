@@ -78,10 +78,10 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener {
 			@Override
 			public void onUpdate(float pSecondsElapsed){
 				super.onUpdate(pSecondsElapsed);
-				removeObjectsSetForDestruction();
+				//removeObjectsSetForDestruction();
 				removeBricksSetForDestruction();
 				if (resetBall){
-					removeBallPhysicsConnector();
+					resetBall();
 				}
 			}
 		}; 
@@ -95,9 +95,9 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener {
 	    //gameHUD.attachChild(HUDSprite);
 	    camera.setHUD(gameHUD);
 	    // CREATE SCORE TEXT
-	    scoreText = new Text(740, 460, resourceManager.gameFont, "Score: 123456", vbom);
+	    scoreText = new Text(720, 460, resourceManager.gameFont, "Score: 123456", vbom);
 	    scoreText.setTextOptions(new TextOptions());
-	    livesText = new Text(20, 460, resourceManager.gameFont, "Lives: 123456", vbom);
+	    livesText = new Text(5, 460, resourceManager.gameFont, "Lives: 123456", vbom);
 	    livesText.setTextOptions(new TextOptions());
 	    
 	    //scoreText.setAnchorCenter(0, 0);    
@@ -141,11 +141,7 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener {
 		physicsWorld.registerPhysicsConnector(new PhysicsConnector(wallRight, bodyWallRight, true, true));
 		attachChild(wallRight);
 		
-		player = new Player(360, 450, vbom, physicsWorld){
-			@Override
-			public void onDie(){
-        	}
-		};
+		player = new Player(360, 450, vbom, physicsWorld);
 		attachChild(player);
 		
 		ball = new Ball(390, 200, vbom, physicsWorld);
@@ -161,13 +157,10 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener {
 	  	}
 	}
 	
-	private void createBackground()
-	{
-		//setBackground(new Background(Color.WHITE));
+	private void createBackground(){
 		attachChild(new Sprite(0, 0, resourceManager.game_background_region, vbom){
 	        @Override
-	        protected void preDraw(GLState pGLState, Camera pCamera) 
-	        {
+	        protected void preDraw(GLState pGLState, Camera pCamera) {
 	            super.preDraw(pGLState, pCamera);
 	            pGLState.enableDither();
 	        }
@@ -199,14 +192,23 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener {
                 	}
                 	
                 	if (( x1.getBody().getUserData() == "floor") && (x2.getBody().getUserData() == "ball")){
-                		x2.getBody().setUserData("destroy");
+                		//x2.getBody().setUserData("destroy");
                 		player.loseLife();
-                		//livesText.setText("Lives: " + player.getLives());
+                		livesText.setText("Lives: " + player.getLives());
                 		resetBall = true;
                 	}
                 	
                 	if (( x1.getBody().getUserData() == "brick") && (x2.getBody().getUserData() == "ball")){
-                		ball.bounce(true);
+                		x1.getBody().setUserData("destroy");
+                		score += 1;
+                		scoreText.setText("Score: " + score);
+                		if((x1.getBody().getPosition().y - 10 <= x2.getBody().getPosition().y) ||
+                		   (x1.getBody().getPosition().y >= x2.getBody().getPosition().y + 10)){
+                			ball.bounce(true);
+                		}
+                		else{
+                			ball.bounce(false);
+                		}
                 	}
                 }
             }
@@ -227,32 +229,21 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener {
     // CLASS LOGIC
     //---------------------------------------------
 	
-	private void removeObjectsSetForDestruction()
-	{
-		for (Iterator<Body> iter = physicsWorld.getBodies(); iter.hasNext();){
-			final Body currentBody = iter.next();
-			if (currentBody.getUserData() == "destroy"){
-				this.engine.runOnUpdateThread(new Runnable(){
-					public void run() {
-						physicsWorld.destroyBody(currentBody);
-						currentBody.setUserData(null);
-					}
-				});
-			}
-		}
-	}
-	
-	private void removeBallPhysicsConnector(){
+	private void resetBall(){
 		this.engine.runOnUpdateThread(new Runnable(){
 			public void run() {
-					// Find the physics connector associated with the sprite mPiglet
-					PhysicsConnector physicsConnector = physicsWorld.getPhysicsConnectorManager().findPhysicsConnectorByShape(ball);
-					// Unregister the physics connector
-					physicsWorld.unregisterPhysicsConnector(physicsConnector);
-				}
-			});
+				PhysicsConnector physicsConnector = physicsWorld.getPhysicsConnectorManager().findPhysicsConnectorByShape(ball);
+				// Unregister the physics connector
+				physicsWorld.unregisterPhysicsConnector(physicsConnector);
+				physicsConnector.getBody().setUserData("removedBall");
+				physicsWorld.destroyBody(physicsConnector.getBody());
+				detachChild(ball);
+				ball.dispose();
+			}
+		});
 		resetBall = false;
-		ball.reset(physicsWorld);
+		ball = new Ball(390, 200, vbom, physicsWorld);
+		attachChild(ball);
 	}
 	
 	private void removeBricksSetForDestruction(){
@@ -260,16 +251,19 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener {
 			final int x = i;
 	    	for (int j=0; j < NCOLS; j++) {
 	    		final int y = j;
-	    		if (bricks[i][j].getHP() < 1){
-	    			this.engine.runOnUpdateThread(new Runnable(){
-	    				public void run() {
-	    						// Find the physics connector associated with the sprite mPiglet
+	    		if (!bricks[i][j].isDestroyed()){
+	    			if (bricks[i][j].getBody().getUserData() == "destroy"){
+	    				this.engine.runOnUpdateThread(new Runnable(){
+	    					public void run() {
 	    						PhysicsConnector physicsConnector = physicsWorld.getPhysicsConnectorManager().findPhysicsConnectorByShape(bricks[x][y]);
 	    						// Unregister the physics connector
 	    						physicsWorld.unregisterPhysicsConnector(physicsConnector);
 	    						physicsWorld.destroyBody(physicsConnector.getBody());
 	    					}
 	    				});
+	    				bricks[i][j].setVisible(false);
+	    				bricks[i][j].setDestroyed(true);
+	    			}
 	    		}
 	    	}
 		} 	
@@ -279,40 +273,21 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener {
 	public boolean onSceneTouchEvent(Scene pScene, TouchEvent pSceneTouchEvent) {
 		float touchFromRight = pSceneTouchEvent.getX() - (player.getX() + player.getWidth());
 		float touchFromLeft = pSceneTouchEvent.getX() - player.getX();
+		
 		//Touch to the right of the player
 		if ((touchFromRight > 0) && (touchFromRight < 800)){
-			if (touchFromRight> 100){
-				player.setX(20f);
-			}
-			else if (touchFromRight > 30){
-				player.setX(5f);
-			}
-			else{
-				player.setX(1f);
-			}
+			player.setX(touchFromRight/10);
 		}
 		
 		//Touch to the left of the player
 		else if ((touchFromLeft < 0) && (touchFromLeft > -800)){
-			if(touchFromLeft < -100){
-				player.setX(-20f);
-			}
-			else if (touchFromLeft < -30){
-				player.setX(-5f);
-			}
-			else{
-				player.setX(-1f);
-			}
+			player.setX(touchFromLeft/10);
 		}
-		//float touchedX = pSceneTouchEvent.getX();
-		//float distance = touchedX-player.getX() + 40;
-		//player.setX(distance);
 		return false;
 	}
 	
 	@Override
-	public void disposeScene()
-	{
+	public void disposeScene(){
 	    camera.setHUD(null);
 	    camera.setCenter(400, 240);
 	    ResourceManager.gameMusic.stop();
@@ -335,7 +310,4 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener {
 	//---------------------------------------------
     // LEVEL CREATION
     //---------------------------------------------
-	
-	
-	
 }

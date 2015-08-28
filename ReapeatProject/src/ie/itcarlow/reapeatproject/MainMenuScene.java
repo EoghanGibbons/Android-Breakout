@@ -16,8 +16,7 @@ public class MainMenuScene extends BaseScene implements IOnMenuItemClickListener
 	private final int MENU_SINGLEPLAYER = 0;
 	private final int MENU_MULTIPLAYER = 1;
 	
-	private void createMenuChildScene()
-	{
+	private void createMenuChildScene(){
 	    menuChildScene = new MenuScene(camera);
 	    menuChildScene.setPosition(0, 0);
 	    
@@ -38,8 +37,7 @@ public class MainMenuScene extends BaseScene implements IOnMenuItemClickListener
 	    setChildScene(menuChildScene);
 	}
 
-	public boolean onMenuItemClicked(MenuScene pMenuScene, IMenuItem pMenuItem, float pMenuItemLocalX, float pMenuItemLocalY)
-	{
+	public boolean onMenuItemClicked(MenuScene pMenuScene, IMenuItem pMenuItem, float pMenuItemLocalX, float pMenuItemLocalY){
 	    switch(pMenuItem.getID())
 	    {
 	        case MENU_SINGLEPLAYER:
@@ -89,7 +87,5 @@ public class MainMenuScene extends BaseScene implements IOnMenuItemClickListener
 	            pGLState.enableDither();
 	        }
 	    });
-	}
-
-	
+	}	
 }

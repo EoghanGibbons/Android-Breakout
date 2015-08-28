@@ -5,8 +5,7 @@ import org.andengine.engine.handler.timer.ITimerCallback;
 import org.andengine.engine.handler.timer.TimerHandler;
 import org.andengine.ui.IGameInterface.OnCreateSceneCallback;
 
-public class SceneManager
-{
+public class SceneManager{
     //---------------------------------------------
     // SCENES
     //---------------------------------------------
@@ -27,8 +26,7 @@ public class SceneManager
     private BaseScene currentScene;
     private Engine engine = ResourceManager.getInstance().engine;
     
-    public enum SceneType
-    {
+    public enum SceneType{
         SCENE_SPLASH,
         SCENE_MENU,
         SCENE_GAME,
@@ -41,17 +39,14 @@ public class SceneManager
     // CLASS LOGIC
     //---------------------------------------------
     
-    public void setScene(BaseScene scene)
-    {
+    public void setScene(BaseScene scene){
         engine.setScene(scene);
         currentScene = scene;
         currentSceneType = scene.getSceneType();
     }
     
-    public void setScene(SceneType sceneType)
-    {
-        switch (sceneType)
-        {
+    public void setScene(SceneType sceneType){
+        switch (sceneType){
             case SCENE_MENU:
                 setScene(menuScene);
                 break;
@@ -72,8 +67,7 @@ public class SceneManager
         }
     }
     
-    public void loadGameScene(final Engine mEngine)
-    {
+    public void loadGameScene(final Engine mEngine){
         setScene(loadingScene);
         ResourceManager.getInstance().unloadMenuTextures();
         mEngine.registerUpdateHandler(new TimerHandler(0.1f, new ITimerCallback() 
@@ -103,8 +97,7 @@ public class SceneManager
         }));
     }
 
-    public void loadMenuScene(final Engine mEngine)
-    {
+    public void loadMenuScene(final Engine mEngine){
         setScene(loadingScene);
         gameScene.disposeScene();
         ResourceManager.getInstance().unloadGameTextures();
@@ -134,24 +127,19 @@ public class SceneManager
         }));
     }
     
-    
-    
     //---------------------------------------------
     // GETTERS AND SETTERS
     //---------------------------------------------
     
-    public static SceneManager getInstance()
-    {
+    public static SceneManager getInstance(){
         return INSTANCE;
     }
     
-    public SceneType getCurrentSceneType()
-    {
+    public SceneType getCurrentSceneType(){
         return currentSceneType;
     }
     
-    public BaseScene getCurrentScene()
-    {
+    public BaseScene getCurrentScene(){
         return currentScene;
     }
     
@@ -167,8 +155,6 @@ public class SceneManager
         loadGameOverScene(engine);
         gameOverScene = new GameOverScene();
         gameScene.disposeScene();
-        
-        //pOnCreateSceneCallback.onCreateSceneFinished(gameOverScene);
     }
     
     public void createMenuScene(){
@@ -177,7 +163,6 @@ public class SceneManager
         loadingScene = new LoadingScene();
         SceneManager.getInstance().setScene(menuScene);
         disposeSplashScene();
-        
     }
     
     private void disposeSplashScene(){
