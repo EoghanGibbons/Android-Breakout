@@ -15,7 +15,7 @@ public class Player extends Sprite {
 	
 	public Player(float pX, float pY, VertexBufferObjectManager vbo, PhysicsWorld physicsWorld){
 	    super(pX, pY, ResourceManager.getInstance().player_region, vbo);
-	    lives = 3;
+	    lives = 1;
 	    createPhysics(physicsWorld);
 	}
     

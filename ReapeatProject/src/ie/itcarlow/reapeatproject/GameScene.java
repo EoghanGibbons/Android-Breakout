@@ -38,7 +38,6 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener {
 	private HUD gameHUD;
 	
 	private PhysicsWorld physicsWorld;
-	private ITextureRegion mBoundryTextureRegion;
 	
 	private Player player;
 	private Ball ball;
@@ -103,55 +102,6 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener {
 	    livesText.setText("Lives: " + 3);
 	    gameHUD.attachChild(scoreText);
 	    gameHUD.attachChild(livesText);
-	}
-	
-	private void createLevel(){
-		final FixtureDef fixDef = PhysicsFactory.createFixtureDef(0f,0f, 1.0f);
-		
-		BitmapTextureAtlas mTextureBoundryFloor = new BitmapTextureAtlas(engine.getTextureManager(), 800, 10);
-		mBoundryTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(mTextureBoundryFloor, this.activity, "floor.png", 0, 0);
-		Sprite roof = new Sprite(0,-10, mBoundryTextureRegion, engine.getVertexBufferObjectManager());
-		Body bodyRoof = PhysicsFactory.createBoxBody(physicsWorld, roof, BodyType.StaticBody, fixDef);
-		bodyRoof.setUserData("roof");
-		physicsWorld.registerPhysicsConnector(new PhysicsConnector(roof, bodyRoof, true, true));
-		attachChild(roof);
-		
-		Sprite floor = new Sprite(0,500, mBoundryTextureRegion, engine.getVertexBufferObjectManager());
-		Body bodyFloor = PhysicsFactory.createBoxBody(physicsWorld, floor, BodyType.StaticBody, fixDef);
-		bodyFloor.setUserData("floor");
-		floor.setUserData(bodyFloor);
-		physicsWorld.registerPhysicsConnector(new PhysicsConnector(floor, bodyFloor, true, true));
-		attachChild(floor);
-		
-		BitmapTextureAtlas mTextureBoundryWall = new BitmapTextureAtlas(engine.getTextureManager(), 10, 480);
-		mBoundryTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(mTextureBoundryWall, this.activity, "wall.png", 0, 0);
-		mTextureBoundryWall.load();
-		
-		Sprite wallLeft = new Sprite(-10,0, mBoundryTextureRegion, engine.getVertexBufferObjectManager());
-		Body bodyWallLeft = PhysicsFactory.createBoxBody(physicsWorld, wallLeft, BodyType.StaticBody, fixDef);
-		bodyWallLeft.setUserData("wallLeft");
-		physicsWorld.registerPhysicsConnector(new PhysicsConnector(wallLeft, bodyWallLeft, true, true));
-		attachChild(wallLeft);
-		
-		Sprite wallRight = new Sprite(800,0, mBoundryTextureRegion, engine.getVertexBufferObjectManager());
-		Body bodyWallRight = PhysicsFactory.createBoxBody(physicsWorld, wallRight, BodyType.StaticBody, fixDef);
-		bodyWallRight.setUserData("wallRight");
-		physicsWorld.registerPhysicsConnector(new PhysicsConnector(wallRight, bodyWallRight, true, true));
-		attachChild(wallRight);
-		
-		player = new Player(360, 450, vbom, physicsWorld);
-		attachChild(player);
-		
-		ball = new Ball(390, 200, vbom, physicsWorld);
-		attachChild(ball);
-		
-		bricks = new Brick[NROWS][NCOLS];
-		for (int i=0; i < NROWS; i++) {
-	    	for (int j=0; j < NCOLS; j++) {
-	    		bricks[i][j] = new Brick( (i) * (10 +80) , (1+j) * (10 + 20), vbom, physicsWorld, i, j, 1);
-	      		attachChild(bricks[i][j]);
-	    	}
-	  	}
 	}
 	
 	private void createBackground(){
@@ -230,7 +180,6 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener {
 				PhysicsConnector physicsConnector = physicsWorld.getPhysicsConnectorManager().findPhysicsConnectorByShape(ball);
 				// Unregister the physics connector
 				physicsWorld.unregisterPhysicsConnector(physicsConnector);
-				physicsConnector.getBody().setUserData("removedBall");
 				physicsWorld.destroyBody(physicsConnector.getBody());
 				//detachChild(ball);
 				//ball.dispose();
@@ -306,4 +255,46 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener {
 	//---------------------------------------------
     // LEVEL CREATION
     //---------------------------------------------
+	
+	private void createLevel(){
+		final FixtureDef fixDef = PhysicsFactory.createFixtureDef(0f,0f, 1.0f);
+		
+		Sprite roof = new Sprite(0,-10, resourceManager.boundry_region, engine.getVertexBufferObjectManager());
+		Body bodyRoof = PhysicsFactory.createBoxBody(physicsWorld, roof, BodyType.StaticBody, fixDef);
+		bodyRoof.setUserData("roof");
+		physicsWorld.registerPhysicsConnector(new PhysicsConnector(roof, bodyRoof, true, true));
+		attachChild(roof);
+		
+		Sprite floor = new Sprite(0,500, resourceManager.boundry_region, engine.getVertexBufferObjectManager());
+		Body bodyFloor = PhysicsFactory.createBoxBody(physicsWorld, floor, BodyType.StaticBody, fixDef);
+		bodyFloor.setUserData("floor");
+		physicsWorld.registerPhysicsConnector(new PhysicsConnector(floor, bodyFloor, true, true));
+		attachChild(floor);
+		
+		Sprite wallLeft = new Sprite(-10,0, resourceManager.wall_region, engine.getVertexBufferObjectManager());
+		Body bodyWallLeft = PhysicsFactory.createBoxBody(physicsWorld, wallLeft, BodyType.StaticBody, fixDef);
+		bodyWallLeft.setUserData("wallLeft");
+		physicsWorld.registerPhysicsConnector(new PhysicsConnector(wallLeft, bodyWallLeft, true, true));
+		attachChild(wallLeft);
+		
+		Sprite wallRight = new Sprite(800,0, resourceManager.wall_region, engine.getVertexBufferObjectManager());
+		Body bodyWallRight = PhysicsFactory.createBoxBody(physicsWorld, wallRight, BodyType.StaticBody, fixDef);
+		bodyWallRight.setUserData("wallRight");
+		physicsWorld.registerPhysicsConnector(new PhysicsConnector(wallRight, bodyWallRight, true, true));
+		attachChild(wallRight);
+		
+		player = new Player(360, 450, vbom, physicsWorld);
+		attachChild(player);
+		
+		ball = new Ball(390, 200, vbom, physicsWorld);
+		attachChild(ball);
+		
+		bricks = new Brick[NROWS][NCOLS];
+		for (int i=0; i < NROWS; i++) {
+	    	for (int j=0; j < NCOLS; j++) {
+	    		bricks[i][j] = new Brick( (i) * (10 +80) , (1+j) * (10 + 20), vbom, physicsWorld, i, j, 1);
+	      		attachChild(bricks[i][j]);
+	    	}
+	  	}
+	}
 }

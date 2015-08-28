@@ -29,9 +29,7 @@ public class Ball extends AnimatedSprite {
         
         physicsWorld.registerPhysicsConnector(new PhysicsConnector(this, body, true, false){
             @Override
-            public void onUpdate(float pSecondsElapsed)
-            {
-            	//body.setLinearVelocity(body.getLinearVelocity().x * pSecondsElapsed, body.getLinearVelocity().y * pSecondsElapsed);
+            public void onUpdate(float pSecondsElapsed){
                 super.onUpdate(pSecondsElapsed);
             }
         });
@@ -54,5 +52,9 @@ public class Ball extends AnimatedSprite {
 	
 	public void setXVelocity(float pXVel){
 		body.setLinearVelocity((float)(pXVel*.1), body.getLinearVelocity().y);
+	}
+
+	public Body getBody(){
+		return body;
 	}
 }

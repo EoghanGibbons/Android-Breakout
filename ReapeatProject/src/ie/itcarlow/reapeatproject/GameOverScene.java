@@ -1,7 +1,10 @@
 package ie.itcarlow.reapeatproject;
 
 import org.andengine.engine.camera.Camera;
+import org.andengine.entity.scene.IOnSceneTouchListener;
+import org.andengine.entity.scene.Scene;
 import org.andengine.entity.sprite.Sprite;
+import org.andengine.input.touch.TouchEvent;
 import org.andengine.opengl.util.GLState;
 
 import ie.itcarlow.reapeatproject.SceneManager.SceneType;
@@ -30,7 +33,7 @@ private Sprite gameOver;
     @Override
     public void onBackKeyPressed()
     {
-
+    	SceneManager.getInstance().loadMenuScene(engine);
     }
 
     @Override
@@ -45,5 +48,4 @@ private Sprite gameOver;
         this.detachSelf();
         this.dispose();
     }
-
 }

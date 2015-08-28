@@ -64,6 +64,8 @@ public class ResourceManager
     public ITextureRegion player_region;
     public ITextureRegion brick_region;
     public ITextureRegion HUD_region;
+    public ITextureRegion boundry_region;
+    public ITextureRegion wall_region;
     public ITiledTextureRegion ball_region;
     public ITextureRegion game_background_region;
     public Font gameFont;
@@ -142,6 +144,8 @@ public class ResourceManager
     	game_background_region = BitmapTextureAtlasTextureRegionFactory.createFromAsset(gameTextureAtlas, activity, "BreakoutBackground.png");
     	ball_region = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(gameTextureAtlas, activity, "ball.png", 8, 4);
     	HUD_region = BitmapTextureAtlasTextureRegionFactory.createFromAsset(gameTextureAtlas, activity, "HUD.png");
+    	boundry_region = BitmapTextureAtlasTextureRegionFactory.createFromAsset(gameTextureAtlas, activity, "floor.png");
+    	wall_region = BitmapTextureAtlasTextureRegionFactory.createFromAsset(gameTextureAtlas, activity, "wall.png");
     	
     	try 
         {
