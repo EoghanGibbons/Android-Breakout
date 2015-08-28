@@ -17,6 +17,7 @@ public class Ball extends AnimatedSprite {
 	    this.setWidth(20);
 	    this.setHeight(20);
 	    createPhysics(physicsWorld);
+	    setSpinning();
 	}
 	
 	private void createPhysics(PhysicsWorld physicsWorld){        
@@ -32,44 +33,6 @@ public class Ball extends AnimatedSprite {
             {
             	//body.setLinearVelocity(body.getLinearVelocity().x * pSecondsElapsed, body.getLinearVelocity().y * pSecondsElapsed);
                 super.onUpdate(pSecondsElapsed);
-                final long[] BALL_ANIMATE = new long[] { 100, 100, 100, 100, 100, 100, 100, 100,
-                										 100, 100, 100, 100, 100, 100, 100, 100,
-                										 100, 100, 100, 100, 100, 100, 100, 100,
-                										 100, 100, 100, 100, 100, 100, 100, 100};
-                animate(BALL_ANIMATE, 1, 32, true, new IAnimationListener(){
-
-					@Override
-					public void onAnimationStarted(
-							AnimatedSprite pAnimatedSprite,
-							int pInitialLoopCount) {
-						// TODO Auto-generated method stub
-						
-					}
-
-					@Override
-					public void onAnimationFrameChanged(
-							AnimatedSprite pAnimatedSprite, int pOldFrameIndex,
-							int pNewFrameIndex) {
-						// TODO Auto-generated method stub
-						
-					}
-
-					@Override
-					public void onAnimationLoopFinished(
-							AnimatedSprite pAnimatedSprite,
-							int pRemainingLoopCount, int pInitialLoopCount) {
-						// TODO Auto-generated method stub
-						
-					}
-
-					@Override
-					public void onAnimationFinished(
-							AnimatedSprite pAnimatedSprite) {
-						animate(BALL_ANIMATE, 1, 32, true);
-						
-					}
-                	
-                });
             }
         });
     }
@@ -79,6 +42,14 @@ public class Ball extends AnimatedSprite {
 			body.setLinearVelocity(body.getLinearVelocity().x, body.getLinearVelocity().y * -1);
 		else
 			body.setLinearVelocity(body.getLinearVelocity().x * -1, body.getLinearVelocity().y);
+	}
+	
+	public void setSpinning(){
+		final long[] BALL_ANIMATE = new long[] { 100, 100, 100, 100, 100, 100, 100, 100,
+				 100, 100, 100, 100, 100, 100, 100, 100,
+				 100, 100, 100, 100, 100, 100, 100, 100,
+				 100, 100, 100, 100, 100, 100, 100, 100};
+		animate(BALL_ANIMATE, 0, 31, true);
 	}
 	
 	public void setXVelocity(float pXVel){

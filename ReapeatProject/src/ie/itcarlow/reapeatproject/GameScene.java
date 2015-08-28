@@ -2,8 +2,6 @@ package ie.itcarlow.reapeatproject;
 
 import ie.itcarlow.reapeatproject.SceneManager.SceneType;
 
-import java.util.Iterator;
-
 import org.andengine.engine.camera.Camera;
 import org.andengine.engine.camera.hud.HUD;
 import org.andengine.entity.scene.IOnSceneTouchListener;
@@ -145,7 +143,6 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener {
 		attachChild(player);
 		
 		ball = new Ball(390, 200, vbom, physicsWorld);
-		
 		attachChild(ball);
 		
 		bricks = new Brick[NROWS][NCOLS];
@@ -167,17 +164,13 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener {
 	    });
 	}
 	
-	private ContactListener createContactListener()
-    {
-        ContactListener contactListener = new ContactListener()
-        {
-            public void beginContact(Contact contact)
-            {
+	private ContactListener createContactListener(){
+        ContactListener contactListener = new ContactListener(){
+            public void beginContact(Contact contact){
                 final Fixture x1 = contact.getFixtureA();
                 final Fixture x2 = contact.getFixtureB();
 
-                if (x1.getBody().getUserData() != null && x2.getBody().getUserData() != null)
-                {
+                if (x1.getBody().getUserData() != null && x2.getBody().getUserData() != null){
                 	if ((x1.getBody().getUserData() == "player") && (x2.getBody().getUserData() == "ball")){
                 		ball.setXVelocity((ball.getX() + (ball.getWidth()/2)) - (player.getX() + (player.getWidth()/2)));
                 		ball.bounce(true);
@@ -192,8 +185,10 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener {
                 	}
                 	
                 	if (( x1.getBody().getUserData() == "floor") && (x2.getBody().getUserData() == "ball")){
-                		//x2.getBody().setUserData("destroy");
                 		player.loseLife();
+                		if (player.getLives() == 0){
+                			gameOver = true;
+                		}
                 		livesText.setText("Lives: " + player.getLives());
                 		resetBall = true;
                 	}
@@ -237,8 +232,9 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener {
 				physicsWorld.unregisterPhysicsConnector(physicsConnector);
 				physicsConnector.getBody().setUserData("removedBall");
 				physicsWorld.destroyBody(physicsConnector.getBody());
-				detachChild(ball);
-				ball.dispose();
+				//detachChild(ball);
+				//ball.dispose();
+				//ball = null;
 			}
 		});
 		resetBall = false;
