@@ -1,6 +1,7 @@
 package ie.itcarlow.reapeatproject;
 
 import ie.itcarlow.reapeatproject.SceneManager.SceneType;
+import ie.itcarlow.sharedpref.R;
 
 import org.andengine.engine.camera.Camera;
 import org.andengine.engine.camera.hud.HUD;
@@ -18,6 +19,9 @@ import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlas;
 import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlasTextureRegionFactory;
 import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.util.GLState;
+
+import android.content.Context;
+import android.content.SharedPreferences;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -297,4 +301,23 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener {
 	    	}
 	  	}
 	}
+
+	//---------------------------------------------
+    // Persistence Functionality
+    //---------------------------------------------
+	
+	/*
+	public void saveHighScore(String playerId, int highScore) {
+		 resourceManager.mSharedPref = activity.getPreferences(Context.MODE_PRIVATE);
+		 SharedPreferences.Editor editor = resourceManager.mSharedPref.edit();		
+		 editor.putInt(activity.getString(R.string.saved_high_score) + playerId, highScore);
+		 editor.commit();
+	 }
+	 
+	 public int getHighScore(String playerId) {		 	
+		 int defaultValue = 0;
+		 int highScore = resourceManager.mSharedPref.getInt(mActivity.getString(R.string.saved_high_score) + playerId, defaultValue);
+		 return highScore;
+	 }
+	 */
 }

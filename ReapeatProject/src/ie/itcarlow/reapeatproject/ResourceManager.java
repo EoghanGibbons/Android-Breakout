@@ -21,6 +21,8 @@ import org.andengine.opengl.texture.region.ITiledTextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 import org.andengine.util.debug.Debug;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 
 public class ResourceManager
@@ -40,6 +42,7 @@ public class ResourceManager
     private BitmapTextureAtlas gameOverTextureAtlas;
     private BuildableBitmapTextureAtlas menuTextureAtlas;
     public Font font;
+    public static SharedPreferences mSharedPref;
     
     //audio
     public static Music gameMusic;
@@ -220,6 +223,8 @@ public class ResourceManager
         getInstance().activity = activity;
         getInstance().camera = camera;
         getInstance().vbom = vbom;
+        
+        mSharedPref = activity.getPreferences(Context.MODE_PRIVATE);
     }
     
     //---------------------------------------------
