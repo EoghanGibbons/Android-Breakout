@@ -4,6 +4,8 @@ import java.io.IOException;
 
 import org.andengine.audio.music.Music;
 import org.andengine.audio.music.MusicFactory;
+import org.andengine.audio.sound.Sound;
+import org.andengine.audio.sound.SoundFactory;
 import org.andengine.engine.Engine;
 import org.andengine.engine.camera.Camera;
 import org.andengine.opengl.font.Font;
@@ -45,7 +47,7 @@ public class ResourceManager
     public static SharedPreferences mSharedPref;
     
     //audio
-    public static Music gameMusic;
+    public static Sound bounceSound;
     public static Music menuMusic;
     
     //---------------------------------------------
@@ -152,8 +154,8 @@ public class ResourceManager
     	
     	try 
         {
-            this.gameTextureAtlas.build(new BlackPawnTextureAtlasBuilder<IBitmapTextureAtlasSource, BitmapTextureAtlas>(0, 1, 0));
-            this.gameTextureAtlas.load();
+            gameTextureAtlas.build(new BlackPawnTextureAtlasBuilder<IBitmapTextureAtlasSource, BitmapTextureAtlas>(0, 1, 0));
+            gameTextureAtlas.load();
         } 
         catch (final TextureAtlasBuilderException e)
         {
@@ -172,9 +174,11 @@ public class ResourceManager
     
     private void loadGameAudio()
     {
-    	MusicFactory.setAssetBasePath("");
+    	SoundFactory.setAssetBasePath("");
         try {
-			gameMusic = MusicFactory.createMusicFromAsset(engine.getMusicManager(), activity, "music.mp3");
+			bounceSound = SoundFactory.createSoundFromAsset(engine.getSoundManager(), activity, "boing.wav");
+			
+			//bounceSound.setLoopCount(0);
 		}  catch (IOException e) {
 			e.printStackTrace();
 		}

@@ -1,7 +1,6 @@
 package ie.itcarlow.reapeatproject;
 
 import ie.itcarlow.reapeatproject.SceneManager.SceneType;
-import ie.itcarlow.sharedpref.R;
 
 import org.andengine.engine.camera.Camera;
 import org.andengine.engine.camera.hud.HUD;
@@ -15,13 +14,7 @@ import org.andengine.extension.physics.box2d.PhysicsConnector;
 import org.andengine.extension.physics.box2d.PhysicsFactory;
 import org.andengine.extension.physics.box2d.PhysicsWorld;
 import org.andengine.input.touch.TouchEvent;
-import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlas;
-import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlasTextureRegionFactory;
-import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.util.GLState;
-
-import android.content.Context;
-import android.content.SharedPreferences;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -60,8 +53,6 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener {
 	
 	@Override
 	public void createScene(){
-		ResourceManager.gameMusic.play();
-    	ResourceManager.gameMusic.setLooping(true);
 	    createBackground();
 	    createPhysics();
 	    createHUD();
@@ -128,14 +119,17 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener {
                 	if ((x1.getBody().getUserData() == "player") && (x2.getBody().getUserData() == "ball")){
                 		ball.setXVelocity((ball.getX() + (ball.getWidth()/2)) - (player.getX() + (player.getWidth()/2)));
                 		ball.bounce(true);
+                		//resourceManager.bounceSound.play();
                 	}
                 	
                 	if (((x1.getBody().getUserData() == "wallLeft") || (x1.getBody().getUserData() == "wallRight")) && (x2.getBody().getUserData() == "ball")){
                 		ball.bounce(false);
+                		//resourceManager.bounceSound.play();
                 	}
                 	
                 	if ((x1.getBody().getUserData() == "roof") || (x1.getBody().getUserData() == "ball")){
                 		ball.bounce(true);
+                		//resourceManager.bounceSound.play();
                 	}
                 	
                 	if (( x1.getBody().getUserData() == "floor") && (x2.getBody().getUserData() == "ball")){
@@ -154,9 +148,11 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener {
                 		if((x1.getBody().getPosition().y - 10 <= x2.getBody().getPosition().y) ||
                 		   (x1.getBody().getPosition().y >= x2.getBody().getPosition().y + 10)){
                 			ball.bounce(true);
+                			//resourceManager.bounceSound.play();
                 		}
                 		else{
                 			ball.bounce(false);
+                			//resourceManager.bounceSound.play();
                 		}
                 	}
                 }
@@ -239,7 +235,6 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener {
 	public void disposeScene(){
 	    camera.setHUD(null);
 	    camera.setCenter(400, 240);
-	    ResourceManager.gameMusic.stop();
 	}
 	
 	@Override

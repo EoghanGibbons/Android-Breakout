@@ -40,6 +40,8 @@ public class Ball extends AnimatedSprite {
 			body.setLinearVelocity(body.getLinearVelocity().x, body.getLinearVelocity().y * -1);
 		else
 			body.setLinearVelocity(body.getLinearVelocity().x * -1, body.getLinearVelocity().y);
+		ResourceManager.bounceSound.play();
+		ResourceManager.bounceSound.setLooping(false);
 	}
 	
 	public void setSpinning(){
