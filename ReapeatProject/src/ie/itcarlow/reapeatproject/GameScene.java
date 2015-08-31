@@ -239,6 +239,7 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener {
 	
 	@Override
 	public void onBackKeyPressed() {
+		disposeScene();
 		 SceneManager.getInstance().loadMenuScene(engine);
 	}
 	

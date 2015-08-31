@@ -39,7 +39,15 @@ public class AndroidWebSocketClient {
 
 		    @Override
 		    public void onMessage(byte[] data) {
-		        //Log.d(TAG, String.format("Got binary message! %s", toHexString(data));
+		    	/*
+		    	try {
+		    		JSONObject json = new JSONObject(data.message);
+		    		String name = json.getString("Name");
+		    		int num = json.getInt("Number");
+		    		}
+		    	catch(JSONException e) {
+				}
+		    	 */
 		    }
 
 		    @Override
@@ -67,7 +75,29 @@ public class AndroidWebSocketClient {
 		}
 		catch(JSONException e) {
 		}
-
+	}
+	
+	void sendBallPositions(int ballX, int ballY) {
+		try { 
+			JSONObject json  = new JSONObject();
+			json.put("type", "ballUpdate");
+			json.put("xPos", ballX);
+			json.put("yPos", "ballY");
+			mClient.send(json.toString());
+		}
+		catch(JSONException e) {
+		}
+	}
+	
+	void sendPlayerPosition(int xPos) {
+		try { 
+			JSONObject json  = new JSONObject();
+			json.put("type", "playerUpdate");
+			json.put("xPos", xPos);
+			mClient.send(json.toString());
+		}
+		catch(JSONException e) {
+		}
 	}
 		
 }
