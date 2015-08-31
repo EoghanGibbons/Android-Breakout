@@ -43,7 +43,7 @@ public class ResourceManager
     private BitmapTextureAtlas splashTextureAtlas;   
     private BitmapTextureAtlas gameOverTextureAtlas;
     private BuildableBitmapTextureAtlas menuTextureAtlas;
-    public Font font;
+    public static Font font;
     public static SharedPreferences mSharedPref;
     
     //audio
@@ -73,6 +73,7 @@ public class ResourceManager
     public ITextureRegion wall_region;
     public ITiledTextureRegion ball_region;
     public ITextureRegion game_background_region;
+    public boolean new_highscore = false;
     public Font gameFont;
     
     //---------------------------------------------
@@ -83,7 +84,6 @@ public class ResourceManager
     {
     	loadMenuGraphics();
         loadMenuAudio();
-        loadMenuFonts();
     }
     
     public void loadGameResources()
@@ -95,8 +95,8 @@ public class ResourceManager
     
     private void loadMenuGraphics(){
     	BitmapTextureAtlasTextureRegionFactory.setAssetBasePath("");
-    	menuTextureAtlas = new BuildableBitmapTextureAtlas(activity.getTextureManager(), 1024, 1024, TextureOptions.BILINEAR);
-    	menu_background_region = BitmapTextureAtlasTextureRegionFactory.createFromAsset(menuTextureAtlas, activity, "menu_background.png");
+    	menuTextureAtlas = new BuildableBitmapTextureAtlas(activity.getTextureManager(), 2048, 2048, TextureOptions.BILINEAR);
+    	menu_background_region = BitmapTextureAtlasTextureRegionFactory.createFromAsset(menuTextureAtlas, activity, "BreakoutBackground.png");
     	singlePlayer_region = BitmapTextureAtlasTextureRegionFactory.createFromAsset(menuTextureAtlas, activity, "SinglePlayer.png");
     	multiPlayer_region = BitmapTextureAtlasTextureRegionFactory.createFromAsset(menuTextureAtlas, activity, "MultiPlayer.png");
     	
@@ -114,27 +114,13 @@ public class ResourceManager
         menuTextureAtlas.load();
     }
     
-    public void unloadMenuTextures()
-    {
-        menuTextureAtlas.unload();
-    }
-    
-    private void loadMenuAudio()
-    {
+    private void loadMenuAudio(){
     	MusicFactory.setAssetBasePath("");
         try {
         	menuMusic = MusicFactory.createMusicFromAsset(engine.getMusicManager(), activity, "mainMenuMusic.mp3");
 		}  catch (IOException e) {
 			e.printStackTrace();
 		}
-    }
-
-    private void loadMenuFonts(){
-        FontFactory.setAssetBasePath("");
-        final ITexture mainFontTexture = new BitmapTextureAtlas(activity.getTextureManager(), 256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
-
-        font = FontFactory.createStrokeFromAsset(activity.getFontManager(), mainFontTexture, activity.getAssets(), "font.ttf", 50, true, Color.WHITE, 2, Color.BLACK);
-        font.load();
     }
     
     public void unloadGameTextures()
@@ -189,10 +175,6 @@ public class ResourceManager
     	splashTextureAtlas = new BitmapTextureAtlas(activity.getTextureManager(), 256, 256, TextureOptions.BILINEAR);
     	splash_region = BitmapTextureAtlasTextureRegionFactory.createFromAsset(splashTextureAtlas, activity, "splash.png", 0, 0);
     	splashTextureAtlas.load();
-    	BitmapTextureAtlasTextureRegionFactory.setAssetBasePath("");
-    	gameOverTextureAtlas = new BitmapTextureAtlas(activity.getTextureManager(), 256, 256, TextureOptions.BILINEAR);
-    	gameOver_region = BitmapTextureAtlasTextureRegionFactory.createFromAsset(gameOverTextureAtlas, activity, "gameover.png", 0, 0);
-    	gameOverTextureAtlas.load();
     }
     
     public void unloadSplashScreen(){
@@ -201,10 +183,6 @@ public class ResourceManager
     }
     
     public void loadGameOverScreen(){
-    	BitmapTextureAtlasTextureRegionFactory.setAssetBasePath("");
-    	gameOverTextureAtlas = new BitmapTextureAtlas(activity.getTextureManager(), 256, 256, TextureOptions.BILINEAR);
-    	gameOver_region = BitmapTextureAtlasTextureRegionFactory.createFromAsset(gameOverTextureAtlas, activity, "gameover.png", 0, 0);
-    	gameOverTextureAtlas.load();
     }
     
     public void unloadGameOverScreen(){
@@ -229,6 +207,12 @@ public class ResourceManager
         getInstance().vbom = vbom;
         
         mSharedPref = activity.getPreferences(Context.MODE_PRIVATE);
+        
+        FontFactory.setAssetBasePath("");
+        final ITexture mainFontTexture = new BitmapTextureAtlas(activity.getTextureManager(), 256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+
+        font = FontFactory.createStrokeFromAsset(activity.getFontManager(), mainFontTexture, activity.getAssets(), "font.ttf", 50, true, Color.WHITE, 2, Color.BLACK);
+        font.load();
     }
     
     //---------------------------------------------
@@ -239,4 +223,17 @@ public class ResourceManager
     {
         return INSTANCE;
     }
+    
+    public void saveHighScore(int highScore) {
+		 mSharedPref = activity.getPreferences(Context.MODE_PRIVATE);
+		 SharedPreferences.Editor editor = mSharedPref.edit();		
+		 editor.putInt(activity.getString(R.string.saved_high_score), highScore);
+		 editor.commit();
+	 }
+    
+    public int getHighScore(){
+		 int defaultValue = 0;
+		 int highScore = ResourceManager.mSharedPref.getInt(activity.getString(R.string.saved_high_score), defaultValue);
+		 return highScore;
+	 }
 }

@@ -1,13 +1,17 @@
 package ie.itcarlow.reapeatproject;
 
 import ie.itcarlow.reapeatproject.SceneManager.SceneType;
+
 import org.andengine.engine.camera.Camera;
+import org.andengine.engine.camera.hud.HUD;
 import org.andengine.entity.scene.menu.MenuScene;
 import org.andengine.entity.scene.menu.MenuScene.IOnMenuItemClickListener;
 import org.andengine.entity.scene.menu.item.IMenuItem;
 import org.andengine.entity.scene.menu.item.SpriteMenuItem;
 import org.andengine.entity.scene.menu.item.decorator.ScaleMenuItemDecorator;
 import org.andengine.entity.sprite.Sprite;
+import org.andengine.entity.text.Text;
+import org.andengine.entity.text.TextOptions;
 import org.andengine.opengl.util.GLState;
 
 public class MainMenuScene extends BaseScene implements IOnMenuItemClickListener {
@@ -15,6 +19,7 @@ public class MainMenuScene extends BaseScene implements IOnMenuItemClickListener
 	private MenuScene menuChildScene;
 	private final int MENU_SINGLEPLAYER = 0;
 	private final int MENU_MULTIPLAYER = 1;
+	private Text title;
 	
 	private void createMenuChildScene(){
 	    menuChildScene = new MenuScene(camera);
@@ -46,6 +51,7 @@ public class MainMenuScene extends BaseScene implements IOnMenuItemClickListener
 	            SceneManager.getInstance().loadGameScene(engine);
 	            return true;
 	        case MENU_MULTIPLAYER:
+	        	ResourceManager.menuMusic.stop();
 	        	SceneManager.getInstance().loadMultiplayerGameScene(engine);
 	            return true;
 	        default:
@@ -55,10 +61,12 @@ public class MainMenuScene extends BaseScene implements IOnMenuItemClickListener
 	
 	@Override
 	public void createScene() {
-		ResourceManager.menuMusic.play();
-    	ResourceManager.menuMusic.setLooping(true);
 		createBackground();
 		createMenuChildScene();
+
+		attachChild(new Text(180, 20, ResourceManager.font, "Multiplayer Breakout", vbom));
+		ResourceManager.menuMusic.play();
+    	ResourceManager.menuMusic.setLooping(true);
 	}
 
 	@Override
@@ -74,7 +82,6 @@ public class MainMenuScene extends BaseScene implements IOnMenuItemClickListener
 	@Override
 	public void disposeScene() {
 		// TODO Auto-generated method stub
-		
 	}
 	
 	public void createBackground(){
@@ -87,5 +94,6 @@ public class MainMenuScene extends BaseScene implements IOnMenuItemClickListener
 	            pGLState.enableDither();
 	        }
 	    });
+		
 	}	
 }

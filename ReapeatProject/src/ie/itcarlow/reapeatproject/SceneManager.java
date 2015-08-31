@@ -69,7 +69,6 @@ public class SceneManager{
     
     public void loadGameScene(final Engine mEngine){
         setScene(loadingScene);
-        ResourceManager.getInstance().unloadMenuTextures();
         mEngine.registerUpdateHandler(new TimerHandler(0.1f, new ITimerCallback() 
         {
             public void onTimePassed(final TimerHandler pTimerHandler) 
@@ -84,7 +83,6 @@ public class SceneManager{
     
     public void loadMultiplayerGameScene(final Engine mEngine){
     	setScene(loadingScene);
-        ResourceManager.getInstance().unloadMenuTextures();
         mEngine.registerUpdateHandler(new TimerHandler(0.1f, new ITimerCallback() 
         {
             public void onTimePassed(final TimerHandler pTimerHandler) 

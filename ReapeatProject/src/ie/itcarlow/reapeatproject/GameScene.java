@@ -16,6 +16,9 @@ import org.andengine.extension.physics.box2d.PhysicsWorld;
 import org.andengine.input.touch.TouchEvent;
 import org.andengine.opengl.util.GLState;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
@@ -119,23 +122,24 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener {
                 	if ((x1.getBody().getUserData() == "player") && (x2.getBody().getUserData() == "ball")){
                 		ball.setXVelocity((ball.getX() + (ball.getWidth()/2)) - (player.getX() + (player.getWidth()/2)));
                 		ball.bounce(true);
-                		//resourceManager.bounceSound.play();
                 	}
                 	
                 	if (((x1.getBody().getUserData() == "wallLeft") || (x1.getBody().getUserData() == "wallRight")) && (x2.getBody().getUserData() == "ball")){
                 		ball.bounce(false);
-                		//resourceManager.bounceSound.play();
                 	}
                 	
                 	if ((x1.getBody().getUserData() == "roof") || (x1.getBody().getUserData() == "ball")){
                 		ball.bounce(true);
-                		//resourceManager.bounceSound.play();
                 	}
                 	
                 	if (( x1.getBody().getUserData() == "floor") && (x2.getBody().getUserData() == "ball")){
                 		player.loseLife();
                 		if (player.getLives() == 0){
                 			gameOver = true;
+                		}
+                		if (score > resourceManager.getHighScore()){
+                			resourceManager.new_highscore = true;
+                			resourceManager.saveHighScore(score);
                 		}
                 		livesText.setText("Lives: " + player.getLives());
                 		resetBall = true;
@@ -148,11 +152,9 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener {
                 		if((x1.getBody().getPosition().y - 10 <= x2.getBody().getPosition().y) ||
                 		   (x1.getBody().getPosition().y >= x2.getBody().getPosition().y + 10)){
                 			ball.bounce(true);
-                			//resourceManager.bounceSound.play();
                 		}
                 		else{
                 			ball.bounce(false);
-                			//resourceManager.bounceSound.play();
                 		}
                 	}
                 }
@@ -240,7 +242,7 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener {
 	@Override
 	public void onBackKeyPressed() {
 		disposeScene();
-		 SceneManager.getInstance().loadMenuScene(engine);
+		SceneManager.getInstance().loadMenuScene(engine);
 	}
 	
 	//---------------------------------------------
@@ -297,23 +299,4 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener {
 	    	}
 	  	}
 	}
-
-	//---------------------------------------------
-    // Persistence Functionality
-    //---------------------------------------------
-	
-	/*
-	public void saveHighScore(String playerId, int highScore) {
-		 resourceManager.mSharedPref = activity.getPreferences(Context.MODE_PRIVATE);
-		 SharedPreferences.Editor editor = resourceManager.mSharedPref.edit();		
-		 editor.putInt(activity.getString(R.string.saved_high_score) + playerId, highScore);
-		 editor.commit();
-	 }
-	 
-	 public int getHighScore(String playerId) {		 	
-		 int defaultValue = 0;
-		 int highScore = resourceManager.mSharedPref.getInt(mActivity.getString(R.string.saved_high_score) + playerId, defaultValue);
-		 return highScore;
-	 }
-	 */
 }

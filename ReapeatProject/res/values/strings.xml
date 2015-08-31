@@ -3,6 +3,7 @@
 
     <string name="app_name">ReapeatProject</string>
     <string name="hello_world">Hello world!</string>
-    <string name="action_settings">Settings</string>
+    <string name="saved_high_score">0</string><string name="action_settings">Settings</string>
+    
 
 </resources>
